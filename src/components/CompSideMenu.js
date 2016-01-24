@@ -24,7 +24,7 @@ export default class CompSideMenu extends React.Component {
 
     var idx = 0;
     var titles = [
-          "Pedidos"
+          "Piezas Facturas"
         , "Recambios"
         , "Empresas"
         , "Piezas"

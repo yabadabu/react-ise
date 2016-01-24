@@ -53,7 +53,7 @@ export default class CompSearchDB extends React.Component {
     var data_results = this.state.searchResults.map( (e) => {
       // Generate an tr entry, binded with the db.id
       // and bind the click to us
-      if( e.name.match( filter )) {
+      if( !e.name || e.name.match( filter )) {
         return (<tr key={e.id} onClick={this.onTouchSearchRow.bind(this,e.id)}><td>{e.id}</td><td>{e.name}</td></tr>);
       }
     });
@@ -61,7 +61,7 @@ export default class CompSearchDB extends React.Component {
     // Add the table format, we already have the rows contents
     var all_results = (
       <table className="search_results">
-      <colgroup><col width="30"/></colgroup><tbody>
+      <colgroup><col width="150px"/></colgroup><tbody>
       <tr><th>ID</th><th>Nombre</th></tr>
       {data_results}</tbody>
       </table>
