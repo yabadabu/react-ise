@@ -5,11 +5,9 @@ $vin-red: #ff0000;
 
 /* Styles */
 body {
-  font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font: 14px 'Roboto', Helvetica, Arial, sans-serif;
   line-height: 1.4em;
   color: #4d4d4d;
-  min-width: 230px;
-  max-width: 550px;
   margin: 0 auto;
   -webkit-font-smoothing: antialiased;
   -moz-font-smoothing: antialiased;
@@ -18,14 +16,33 @@ body {
 }
 
 td {
-	padding: 12px;
+	padding: 0px;
+  padding-right: 16px;
 }
 
 h2 {
 	color: $vin-blue;
 }
 
-.savings { color: $vin-green; }
-.loss { color: $vin-red; }
-input.small { width: 46px; }
-td.fuel-savings-label { width: 175px; }
+table.search_results {
+  width:100%;
+}
+
+table.search_results th {
+  background-color: $vin-blue;
+}
+
+table.search_results tr:nth-child(even) {
+  background-color: #eee;
+}
+table.search_results tr:nth-child(odd) {
+  background-color:#fff;
+}
+
+div.main_section {
+  padding-left:16px;
+  zIndex: 0;
+  padding-right:16px;
+  width: '100%';
+  color: 'red';
+}

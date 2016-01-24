@@ -1,5 +1,5 @@
 {
-  "name": "react-slingshot",
+  "name": "react-ise",
   "version": "1.0.3",
   "description": "Starter kit for creating apps with React and Redux",
   "scripts": {
@@ -20,10 +20,12 @@
   "author": "Cory House",
   "license": "MIT",
   "dependencies": {
+    "material-ui": "0.14.2",
     "object-assign": "4.0.1",
     "react": "0.14.6",
     "react-dom": "0.14.6",
     "react-redux": "4.0.6",
+    "react-tap-event-plugin": "0.2.1",
     "redux": "3.0.5"
   },
   "devDependencies": {
