@@ -1,10 +1,8 @@
 import React, {PropTypes} from 'react';
 
 import CompSearchDB from './CompSearchDB';
+import CompSearchButton from './CompSearchButton';
 import RefreshIndicator from 'material-ui/lib/refresh-indicator';
-
-import IconButton from 'material-ui/lib/icon-button';
-import ActionSearch from 'material-ui/lib/svg-icons/action/search';
 
 const style = {
   refresh: {
@@ -37,9 +35,7 @@ export default class CompPiezasDetails extends React.Component {
         var raw_obj = JSON.stringify( this.state.entry_data[0], null, '  ');
         entry = ( 
           <div>
-          <IconButton 
-              tooltip="Buscar de nuevo" 
-              onClick={this.onNewEntryData.bind(this, null, null)}><ActionSearch/></IconButton>
+          <CompSearchButton onClick={this.onNewEntryData.bind(this, null, null)}/>
           <pre>{raw_obj}</pre>
           </div>
           );

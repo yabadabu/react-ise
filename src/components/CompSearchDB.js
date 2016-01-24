@@ -1,6 +1,5 @@
 import React, {PropTypes} from 'react';
 import TextField from 'material-ui/lib/text-field';
-
 import dbConn from '../store/db_connection.js';
 
 export default class CompSearchDB extends React.Component {
@@ -10,7 +9,6 @@ export default class CompSearchDB extends React.Component {
     this.state = {
       searchTerm: ""        // Current terms to search
     , searchResults: []     // Current results recovered
-    , queryTitle: 'Nombre de la Pieza'
     };
   }
 
@@ -71,15 +69,16 @@ export default class CompSearchDB extends React.Component {
 
     return (
       <div>
-      <TextField fullWidth hintText={this.state.queryTitle} 
-                 floatingLabelText={this.state.queryTitle}
-                 value={this.state.searchTerm}
-                 onChange={this.onChangeSearchFld.bind(this)}
-                 />
-
+      <TextField 
+        fullWidth 
+        hintText={this.props.queryTitle} 
+        floatingLabelText={this.props.queryTitle}
+        value={this.state.searchTerm}
+        onChange={this.onChangeSearchFld.bind(this)}
+        />
       {all_results}
       </div>
-      );
+    );
   }
 }
 
