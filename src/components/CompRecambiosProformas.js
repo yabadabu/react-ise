@@ -27,19 +27,31 @@ export default class CompRecambiosProformas extends React.Component {
     this.setState({entry_id:new_entry_id, entry_data:new_entry_data});
   }
 
+  onChange( new_state ) {
+    this.setState({entry_data:new_state});
+  }
+
+  onClick( e ) {
+    console.log( "onClick")
+    console.log( this )
+  }
+
   render() {
 
     var show_results = false;
     var entry = "";
     if( this.state.entry_id ) {
       if( this.state.entry_data) {
-        console.log( this.state.entry_data )
 
         var raw_obj = JSON.stringify( this.state.entry_data, null, '  ');
         entry = ( 
           <div>
           <CompSearchButton onClick={this.onNewEntryData.bind(this, null, null)}/>
-          <CompEditForm data={this.state.entry_data} layout="proforma"/>
+          <CompEditForm 
+              data={this.state.entry_data} 
+              onChange={this.onChange.bind(this)} 
+              onClick={this.onClick.bind(this)} 
+              layout="proforma"/>
           </div>
           );
       } else {

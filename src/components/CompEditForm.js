@@ -26,28 +26,58 @@ const all_layouts = {
     , { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } }
     , { field:"Provincia", type:"provincia", hint:"Provincia", style:{ width:"15%" } }
     , { type:"separator"}
-    , { field:"Notes", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true }
+    , { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true }
     ]
   }
 };
 
 export default class CompEditForm extends React.Component {
+
   formatDate( date ) {
     //var dobj = Date( date );
     return date.toLocaleDateString();
   }
 
-  handleClick( ) {
-    console.log( "hi")
+/*
+  formatDate2(date) {
+    var year = date.getFullYear(),
+        month = date.getMonth() + 1, // months are zero indexed
+        day = date.getDate(),
+        hour = date.getHours(),
+        minute = date.getMinutes(),
+        second = date.getSeconds(),
+        hourFormatted = hour % 12 || 12, // hour returned in 24 hour format
+        minuteFormatted = minute < 10 ? "0" + minute : minute,
+        morning = hour < 12 ? "am" : "pm";
+
+    return day + "/" + month + "/" + year + " " + hourFormatted + ":" +
+            minuteFormatted + morning;
+  }
+  */
+
+  handleChange( field, e ) {
+    var changed = {};
+    changed[field.field] = e.target.value;
+    this.props.onChange( Object.assign( {}, this.props.data, changed))
+  }
+
+  handleAutoCompleteChange( field, new_value ) {
+    var changed = {};
+    changed[field.field] = new_value;
+    this.props.onChange( Object.assign( {}, this.props.data, changed))
+  }
+
+  handleDateChange( field, this_is_null, new_date ) {
+    var changed = {};
+    changed[field.field] = new_date.toLocaleDateString(); // this.formatDate( new_date );
+    this.props.onChange( Object.assign( {}, this.props.data, changed))
   }
 
   render() {
     const cfg = all_layouts[ this.props.layout ];
-    console.log( cfg );
     var entries = [];
 
     var obj = this.props.data;
-
 
     for( var idx in cfg.fields ) {
       var f = cfg.fields[ idx ];
@@ -65,19 +95,29 @@ export default class CompEditForm extends React.Component {
             style={f.style}
             fullWidth={f.fullWidth}
             multiLine={f.multiLine}
+            id={f.field}
+            onChange={this.handleChange.bind(this,f)}
             key={idx}/></span>
           );
+
       } else if( f.type == "action" ) {
-        entries.push( (<ActionSearch onClick={this.handleClick}/>) );
+        entries.push( (
+          <ActionSearch 
+            onClick={this.props.onClick.bind( f.field )}
+          />
+          ) );
 
       } else if( f.type == "provincia" ) {
         entries.push( 
           <AutoComplete
             floatingLabelText={f.field}
             filter={AutoComplete.caseInsensitiveFilter}
+            onUpdateInput={this.handleAutoCompleteChange.bind(this,f)}
+            onNewRequest={this.handleAutoCompleteChange.bind(this,f)}
             dataSource={["Barcelona", "Sevilla", "Madrid", "Leon"]}
             /> 
           );
+
       } else if( f.type == "date" ) {
         entries.push( 
           <div style={f.style}>
@@ -88,6 +128,7 @@ export default class CompEditForm extends React.Component {
             textFieldStyle={f.textstyle}
             style={f.style}
             formatDate={this.formatDate}
+            onChange={this.handleDateChange.bind(this,f)}
             mode="landscape" />
             </div>
           );
@@ -104,4 +145,6 @@ export default class CompEditForm extends React.Component {
 CompEditForm.propTypes = {
   data: PropTypes.object.isRequired
 , layout: PropTypes.string.isRequired
+, onChange: PropTypes.function
+, onClick: PropTypes.function
 };
