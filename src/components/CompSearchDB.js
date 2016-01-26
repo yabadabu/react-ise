@@ -18,13 +18,30 @@ export default class CompSearchDB extends React.Component {
     var new_text = e.target.value;
     this.setState({searchTerm: new_text});
     if( new_text.length > 3 ) {
-      // Do the fuzzy query and get the results back to me
-      dbConn.get( this.props.fuzzySearchQuery
-                , new_text
-                , this
-                , (data) => {
-        this.setState({searchResults: data});
-      });
+      console.log( this.props );
+      if( this.props.sql ) {
+        var resolved_filter = this.props.sql.filter.replace( /#searchTerm#/, this.state.searchTerm );
+        // Do the fuzzy query and get the results back to me
+        dbConn.sql( this.props.sql.fields
+                  , this.props.sql.table
+                  , resolved_filter
+                  , this
+                  , (data) => {
+          console.log( "Received from the db connection callback" );
+          console.log( data );
+          this.setState({searchResults: data});
+        });  
+      } else {
+        // Do the fuzzy query and get the results back to me
+        dbConn.get( this.props.fuzzySearchQuery
+                  , new_text
+                  , this
+                  , (data) => {
+          //console.log( "Received from the db connection callback" );
+          //console.log( data );
+          this.setState({searchResults: data});
+        });
+      }
     }
   }
 
@@ -33,12 +50,11 @@ export default class CompSearchDB extends React.Component {
     console.log( id );
     // Notify we start searching for item with ID id
     this.props.onEntryData( id, null );
-    //this.setState({entry_id: id, entry_data:null});
     // Search in the db all the details
     dbConn.get( this.props.exactSearchQuery, id, this, (data) => {
+    console.log( data );
       this.props.onEntryData( id, data );
       // Return the full details
-      //this.setState({entry_data: data[0]});
     });
   }  
 
@@ -50,13 +66,29 @@ export default class CompSearchDB extends React.Component {
 
     // Do an extra filter, case insensitive, on each result
     var filter = new RegExp(this.state.searchTerm, "i");
-    var data_results = this.state.searchResults.map( (e) => {
-      // Generate an tr entry, binded with the db.id
-      // and bind the click to us
-      if( !e.name || e.name.match( filter )) {
-        return (<tr key={e.id} onClick={this.onTouchSearchRow.bind(this,e.id)}><td>{e.id}</td><td>{e.name}</td></tr>);
-      }
-    });
+    var data_results;
+    console.log( this.state.searchResults );
+    if( Array.isArray( this.state.searchResults ) ) {
+      data_results = this.state.searchResults.map( (row) => {
+        // Generate an tr entry, binded with the db.id
+        // and bind the click to us
+        if( !row.name || row.name.match( filter )) {
+          var tds = [];
+          for( var fld in row ) {
+            var value = row[fld];
+            tds.push( <td>{value}</td> );
+          }
+          return (
+            <tr key={row.id} onClick={this.onTouchSearchRow.bind(this,row.id)}>
+            {tds}
+            </tr>
+          )
+        }
+      })
+    }
+    if( !data_results || data_results.length == 0 ) {
+      data_results = (<tr key={"empty_results"}><td></td><td>Sin resultados</td></tr>);
+    }
 
     // Add the table format, we already have the rows contents
     var all_results = (
@@ -88,5 +120,6 @@ CompSearchDB.propTypes = {
 , fuzzySearchQuery: PropTypes.string.isRequired
 , exactSearchQuery: PropTypes.string.isRequired
 , queryTitle: PropTypes.string.isRequired
+, sql: PropTypes.object
 };
 

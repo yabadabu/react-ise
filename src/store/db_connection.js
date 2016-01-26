@@ -21,6 +21,14 @@ class DBConnection {
     this.callback = callback;
     this.connection.send( JSON.stringify({q:what, text:arg }));
   } 
+
+  sql( fields, table, filter, callback_ctx, callback ) {
+    this.callback_ctx = callback_ctx;
+    this.callback = callback;
+    var arg = {q:"sql", fields:fields, table:table, filter:filter };
+    console.log( arg );
+    this.connection.send( JSON.stringify(arg));
+  } 
 }
 
 let theDBConnection = new DBConnection();

@@ -17,6 +17,7 @@ db.open( conn_str, function ( err ) {
   q = "select * from [Referencias] where REF like '1723%'";
   q = "select * from [Piezas] where IDPieza = 232";
   q = "select * from [Piezas Facturas] where [IDFactura] = '01-I0435'"
+  q = "select * from [Piezas Facturas Detalle] where IDFactura = '15-1085-M'"
   //q = "SELECT Name FROM MSysObjects WHERE Type = 1"
   db.query( q, function (err, data ) {
     if( err ) console.log( err );

@@ -32,6 +32,10 @@ function connectToDBRecambios( callback ) {
   connectToDB( callback, "DSN=Recambios");
 }
 
+function connectToDBProformas( callback ) {
+  connectToDB( callback, "DSN=Proformas");
+}
+
 function connectToDBPiezas( callback ) {
   connectToDB( callback, "DSN=AllPiezas");
 }
@@ -69,57 +73,106 @@ function quoted( x ) {
   return "'" + x + "'";
 }
 
+function genSQL( fields, table, filter ) {
+  return 'select ' + fields.join() + ' from ' + table + ' where ' + filter;
+}
+
 // ----------------------------------------------------------
-function onClientRequest( conn, inmsg ) {
-  var filter, fields, table;
+function execRequest( inmsg, request_callback ) {
+  var tasks= [];
   if( inmsg.q === "EmpresasLike" ) {
-    filter = "[Empresa] like '%" + inmsg.text + "%'";
-    fields = ['[Número Cliente] as id', 'Empresa as name'];
-    table = 'Clientes';
+    taskspush( { sql:genSQL( ['[Número Cliente] as id', 'Empresa as name']
+                      , 'Clientes'
+                      , "[Empresa] like '%" + inmsg.text + "%'"
+                      ) } );
   }
   else if( inmsg.q === "EmpresaByID" ) {
-    filter = "[Número Cliente] = " + inmsg.text;
-    fields = ["*"];
-    table = 'Clientes';
-  }
-  
-  else if( inmsg.q === "PiezasFacturasLike" ) {
-    filter = "[IDFactura] like '%" + inmsg.text + "%'";
-    fields = ['IDFactura as id', 'Empresa as name'];
-    table = '[Piezas Facturas]';
-  }
-  else if( inmsg.q === "PiezasFacturaByID" ) {
-    filter = "[IDFactura] = " + quoted( inmsg.text );
-    fields = ["*"];
-    table = '[Piezas Facturas]';
+    tasks.push( { single: true
+              , sql:genSQL( ["*"]
+                      , 'Clientes'
+                      , "[Número Cliente] = " + quoted( inmsg.text )
+                      ) } );
   }
 
-  else if( inmsg.q === "ReferencesLike" ) {
-    filter = "[REF] like '%" + inmsg.text + "%'";
-    fields = ['REF as id', 'Nombre as name'];
-    table = 'Referencias';
+  else if( inmsg.q === "sql" ) {
+    tasks.push( { sql: genSQL( inmsg.fields, inmsg.table, inmsg.filter ) } );
+  } 
+  else if( inmsg.q === "rawSql" ) {
+    tasks.push( { sql: inmsg.sql } );
   }
-  else if( inmsg.q === "FacturasLike" ) {
-    filter = "[REF] like '%" + inmsg.text + "%'";
-    fields = ['REF as id', 'Nombre as name'];
-    table = 'Referencias';
+
+  else if( inmsg.q === "Recambios.Proforma.ByID" ) {
+    tasks.push( 
+      { single: true 
+      , sql: genSQL( ["*"], "[Recambios - Proformas]", "IDProforma = " + quoted( inmsg.text ) ) } );
+    tasks.push( 
+      { root: "details"
+      , sql: genSQL( ["*"], "[Recambios - Proformas - Detalles]", "IDProforma = " + quoted( inmsg.text ) ) } );
   }
+  else if( inmsg.q === "Recambios.Proforma.Like" ) {
+    tasks.push( 
+      { sql: genSQL( ["IDProforma", "Empresa"], "[Recambios - Proformas]", "IDProforma like '%" + inmsg.text + "%'" ) } );
+  }
+
+
   else {
-    conn.sendUTF( "Invalid query type " + inmsg.q );
+    request_callback("Invalid query type " + inmsg.q, { status:'ko', data:{} });
     return;
   }
 
-  var sql = 'select ' + fields.join() + ' from ' + table + ' where ' + filter;
-  console.log( sql );
-  db.query( sql, function (err, data ) {
+  var final_data;
+
+  var dbtasks = [];
+  tasks.map( (t) => {
+    dbtasks.push( (cb) => { 
+      console.log( t.sql )
+      db.query( t.sql, function (err, data ) {
+        console.log( data );
+        if( t.root ) {
+          if( final_data )
+            final_data[ t.root ] = data;
+        }
+        else {
+          if( t.single ) {
+            console.log( "Got single from " );
+            final_data = data[0];
+          } else {
+            final_data = data;
+          }
+        }
+        cb(err);
+      })
+    })
+  })
+
+  async.series( dbtasks, (err) => {
     if( err ) {
+      console.log( "error!")
       console.log( err );
     }
-    else {
-      console.log( JSON.stringify( data, null, '  ' ) );
-      conn.sendUTF(JSON.stringify({ status:'ok', data:data }));
-    }
+    console.log( "Async completed")
+    console.log( JSON.stringify( final_data, null, '  ' ) );
+    request_callback(null, { status:'ok', data:final_data });
+  });
+}
+
+function test( ) {
+  var r = {q:"PiezasFacturaByID", text:"01-I0951"};
+  r = {q:"PiezasFacturasLike", text:"01-I0988"};
+  r = {q:"PiezasFacturaByID", text:"11-0482-M"};
+  execRequest( r, (err,data) => {
+    console.log( JSON.stringify( data ), null, '  ');
+    process.exit( 0 );
   })
 }
 
-connectToDBPiezas( startWSServer );
+
+// ----------------------------------------------------------
+function onClientRequest( conn, inmsg ) {
+  execRequest( inmsg, (err,data) => {
+    conn.sendUTF(JSON.stringify(data));
+  })
+}
+
+connectToDBProformas( startWSServer );
+//connectToDBPiezas( test );
