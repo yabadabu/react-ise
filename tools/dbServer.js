@@ -77,6 +77,26 @@ function genSQL( fields, table, filter ) {
   return 'select ' + fields.join() + ' from ' + table + ' where ' + filter;
 }
 
+function genUpdateSQL( table, fields, filter ) {
+  console.log( "genUpdateSQL" )
+  console.log( table )
+  console.log( fields )
+  console.log( filter )
+
+  var changes = []
+  for( var f in fields ) {
+    var value = fields[f];
+    if( Array.isArray( value ) )
+      continue;
+    if( value == null )
+      changes.push( f + " = null " );
+    else
+      changes.push( f + " = " + quoted( value ) );
+  }
+  sql = "UPDATE " + table + " SET " + changes.join(",") + " WHERE " + filter;
+  return sql;
+}
+
 // ----------------------------------------------------------
 function execRequest( inmsg, request_callback ) {
   var tasks= [];
@@ -94,9 +114,14 @@ function execRequest( inmsg, request_callback ) {
                       ) } );
   }
 
-  else if( inmsg.q === "sql" ) {
+  else if( inmsg.q === "select" ) {
     tasks.push( { sql: genSQL( inmsg.fields, inmsg.table, inmsg.filter ) } );
   } 
+
+  else if( inmsg.q === "update" ) {
+    tasks.push( { sql: genUpdateSQL( inmsg.table, inmsg.fields, inmsg.filter ) } );
+  } 
+
   else if( inmsg.q === "rawSql" ) {
     tasks.push( { sql: inmsg.sql } );
   }

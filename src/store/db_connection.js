@@ -16,6 +16,7 @@ class DBConnection {
         this.callback.call( this.callback_ctx, json.data );
     };
   }
+
   get( what, arg, callback_ctx, callback ) {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
@@ -25,9 +26,17 @@ class DBConnection {
   sql( fields, table, filter, callback_ctx, callback ) {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
-    var arg = {q:"sql", fields:fields, table:table, filter:filter };
+    var arg = {q:"select", fields:fields, table:table, filter:filter };
     console.log( arg );
     this.connection.send( JSON.stringify(arg));
+  } 
+
+  update( table, fields, filter, callback_ctx, callback ) {
+    this.callback_ctx = callback_ctx;
+    this.callback = callback;
+    var arg = {q:"update", table:table, fields:fields, filter:filter };
+    console.log( arg );
+    this.connection.send( JSON.stringify(arg) );
   } 
 }
 

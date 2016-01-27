@@ -4,6 +4,7 @@ import CompSearchDB from './CompSearchDB';
 import CompSearchButton from './CompSearchButton';
 import CompEditForm from './CompEditForm';
 import RefreshIndicator from 'material-ui/lib/refresh-indicator';
+import dbConn from '../store/db_connection.js';
 
 const style = {
   refresh: {
@@ -34,6 +35,18 @@ export default class CompRecambiosProformas extends React.Component {
   onClick( e ) {
     console.log( "onClick")
     console.log( this )
+    console.log( e )
+    var rec = this.state.entry_data;
+    delete rec[ 'IDProforma' ];
+    var changes = {};
+    changes["Poblacion"] = rec.Poblacion
+    changes["NIF"] = rec.NIF
+    changes["CP"] = rec.CP
+    changes["Calle"] = rec.Calle
+    changes["Provincia"] = rec.Provincia
+    changes["Notas"] = rec.Notas
+    changes["Fecha"] = rec.Fecha
+    dbConn.update( '[Recambios - Proformas]', changes, "IDProforma='"+ this.state.entry_id + "'" );
   }
 
   render() {

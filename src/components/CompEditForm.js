@@ -3,6 +3,10 @@ import TextField from 'material-ui/lib/text-field';
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import AutoComplete from 'material-ui/lib/auto-complete';
 import ActionSearch from 'material-ui/lib/svg-icons/action/home';
+import RaisedButton from 'material-ui/lib/raised-button';
+
+import CardActions from 'material-ui/lib/card/card-actions';
+import FlatButton from 'material-ui/lib/flat-button';
 
 const provincias = [
   [ "Barcelona"
@@ -112,6 +116,7 @@ export default class CompEditForm extends React.Component {
           <AutoComplete
             floatingLabelText={f.field}
             filter={AutoComplete.caseInsensitiveFilter}
+            searchText={value}
             onUpdateInput={this.handleAutoCompleteChange.bind(this,f)}
             onNewRequest={this.handleAutoCompleteChange.bind(this,f)}
             dataSource={["Barcelona", "Sevilla", "Madrid", "Leon"]}
@@ -119,6 +124,7 @@ export default class CompEditForm extends React.Component {
           );
 
       } else if( f.type == "date" ) {
+        var curr_date = new Date( value );
         entries.push( 
           <div style={f.style}>
           <DatePicker
@@ -127,6 +133,7 @@ export default class CompEditForm extends React.Component {
             autoOk
             textFieldStyle={f.textstyle}
             style={f.style}
+            value={curr_date}
             formatDate={this.formatDate}
             onChange={this.handleDateChange.bind(this,f)}
             mode="landscape" />
@@ -135,6 +142,19 @@ export default class CompEditForm extends React.Component {
 
       }
     }
+
+    const buttons_group_style = {float:"right"};
+
+    entries.push( 
+    <CardActions expandable={true} style={buttons_group_style}>
+      <RaisedButton label="Cancel"
+                    onClick={this.props.onClick.bind( this, "Cancel" )}
+      />
+      <RaisedButton label="Save" primary={true}
+                    onClick={this.props.onClick.bind( this, "Save" )}
+      />
+    </CardActions>
+    );
 
     var json = JSON.stringify( obj, null, '  ' );
     entries.push( <pre>{json}</pre> )
