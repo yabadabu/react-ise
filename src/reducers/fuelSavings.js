@@ -22,7 +22,7 @@ const initialState = {
         annual: 0,
         threeYear: 0
     },
-    selectedMainSection: 'Piezas',
+    selectedMainSection: 'Recambios Proformas',
     menuMainSectionOpened: false
 };
 
