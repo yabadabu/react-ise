@@ -74,7 +74,7 @@ function quoted( x ) {
 }
 
 function genSQL( fields, table, filter ) {
-  return 'select ' + fields.join() + ' from ' + table + ' where ' + filter;
+  return 'select ' + fields.join(", ") + ' from ' + table + ' where ' + filter;
 }
 
 function genUpdateSQL( table, fields, filter ) {

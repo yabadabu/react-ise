@@ -7,6 +7,7 @@ import RaisedButton from 'material-ui/lib/raised-button';
 
 import CardActions from 'material-ui/lib/card/card-actions';
 import FlatButton from 'material-ui/lib/flat-button';
+import Tooltip from 'material-ui/lib/tooltip';
 
 const provincias = [
   [ "Barcelona"
@@ -17,47 +18,11 @@ const provincias = [
   ]
 ];
 
-const all_layouts = {
-  proforma: {
-    fields: [
-      { field:"Search", type:"action", hint:"Buscar una empresa" }
-    , { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"70%"} }
-    , { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} }
-    , { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"80px" }, style:{display:"inline-block" } }
-    , { type:"separator"}
-    , { field:"Calle", type:"text", style:{ width:"30%" } }
-    , { field:"Poblacion", type:"text", style:{ width:"30%" } }
-    , { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } }
-    , { field:"Provincia", type:"provincia", hint:"Provincia", style:{ width:"15%" } }
-    , { type:"separator"}
-    , { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true }
-    ]
-  }
-};
-
 export default class CompEditForm extends React.Component {
 
-  formatDate( date ) {
-    //var dobj = Date( date );
-    return date.toLocaleDateString();
+  fmtDate( dt ) {
+    return dt.toLocaleDateString();
   }
-
-/*
-  formatDate2(date) {
-    var year = date.getFullYear(),
-        month = date.getMonth() + 1, // months are zero indexed
-        day = date.getDate(),
-        hour = date.getHours(),
-        minute = date.getMinutes(),
-        second = date.getSeconds(),
-        hourFormatted = hour % 12 || 12, // hour returned in 24 hour format
-        minuteFormatted = minute < 10 ? "0" + minute : minute,
-        morning = hour < 12 ? "am" : "pm";
-
-    return day + "/" + month + "/" + year + " " + hourFormatted + ":" +
-            minuteFormatted + morning;
-  }
-  */
 
   handleChange( field, e ) {
     var changed = {};
@@ -72,24 +37,41 @@ export default class CompEditForm extends React.Component {
   }
 
   handleDateChange( field, this_is_null, new_date ) {
+    console.log( "Ctrl returns " + new_date )
     var changed = {};
-    changed[field.field] = new_date.toLocaleDateString(); // this.formatDate( new_date );
+    changed[field.field] = new_date; 
     this.props.onChange( Object.assign( {}, this.props.data, changed))
   }
 
+  // ---------------------------------------------------------------- 
+  renderButtons() {
+    const buttons_group_style = {float:"right"};
+    return (
+      <CardActions expandable={true} style={buttons_group_style}>
+        <RaisedButton label="Cancel"
+                      onClick={this.props.onClick.bind( this, "Cancel" )}
+        />
+        <RaisedButton label="Save" primary={true}
+                      onClick={this.props.onClick.bind( this, "Save" )}
+        />
+      </CardActions> 
+    )   
+  }
+
+  // ---------------------------------------------------------------- 
   render() {
-    const cfg = all_layouts[ this.props.layout ];
+    const cfg = this.props.layout;
+    const obj = this.props.data;
+
     var entries = [];
-
-    var obj = this.props.data;
-
     for( var idx in cfg.fields ) {
       var f = cfg.fields[ idx ];
       if( f.type === "separator" ) {
         entries.push( <div></div> );
         continue;
       } 
-      var value = obj[ f.field ]
+      var value = obj[ f.field ];
+
       if( f.type === "text" ) {
         entries.push( 
           <span><TextField 
@@ -105,11 +87,11 @@ export default class CompEditForm extends React.Component {
           );
 
       } else if( f.type == "action" ) {
+
         entries.push( (
-          <ActionSearch 
+        <ActionSearch 
             onClick={this.props.onClick.bind( f.field )}
-          />
-          ) );
+          />) );
 
       } else if( f.type == "provincia" ) {
         entries.push( 
@@ -125,46 +107,36 @@ export default class CompEditForm extends React.Component {
 
       } else if( f.type == "date" ) {
         var curr_date = new Date( value );
+        console.log( "Rendering date ")
+        console.log( value )
+        console.log( curr_date)
         entries.push( 
           <div style={f.style}>
           <DatePicker
-            hintText={f.hint}
+            hintText={f.field}
             floatingLabelText={f.field}
             autoOk
             textFieldStyle={f.textstyle}
             style={f.style}
+            formatDate={this.fmtDate}
             value={curr_date}
-            formatDate={this.formatDate}
             onChange={this.handleDateChange.bind(this,f)}
             mode="landscape" />
-            </div>
+          </div>
           );
 
       }
+
     }
 
-    const buttons_group_style = {float:"right"};
-
-    entries.push( 
-    <CardActions expandable={true} style={buttons_group_style}>
-      <RaisedButton label="Cancel"
-                    onClick={this.props.onClick.bind( this, "Cancel" )}
-      />
-      <RaisedButton label="Save" primary={true}
-                    onClick={this.props.onClick.bind( this, "Save" )}
-      />
-    </CardActions>
-    );
-
-    var json = JSON.stringify( obj, null, '  ' );
-    entries.push( <pre>{json}</pre> )
-    return (<div className={this.props.layout}>{entries}</div>);
+    entries.push( this.renderButtons() );
+    return (<div className={this.props.layout.class_name}>{entries}</div>);
   }
 }
 
 CompEditForm.propTypes = {
-  data: PropTypes.object.isRequired
-, layout: PropTypes.string.isRequired
-, onChange: PropTypes.function
-, onClick: PropTypes.function
+  data:     PropTypes.object.isRequired,
+  layout:   PropTypes.object.isRequired,
+  onClick:  PropTypes.func,
+  onChange: PropTypes.func
 };
