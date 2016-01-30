@@ -5,6 +5,18 @@ import CompSearchDB from './CompSearchDB';
 import dbConn from '../store/db_connection.js';
 import CircularProgress from 'material-ui/lib/circular-progress';
 import getLayout from '../store/db_layouts.js';
+import Snackbar from 'material-ui/lib/snackbar';
+
+import IconButton from 'material-ui/lib/icon-button';
+import ActionSearch from 'material-ui/lib/svg-icons/action/search';
+import ActionCopy from 'material-ui/lib/svg-icons/content/content-copy';
+import ActionPaste from 'material-ui/lib/svg-icons/content/content-paste';
+import ActionDelete from 'material-ui/lib/svg-icons/action/delete';
+import ActionNew from 'material-ui/lib/svg-icons/action/open-in-new';
+import ActionSave from 'material-ui/lib/svg-icons/content/save';
+import ActionUndo from 'material-ui/lib/svg-icons/content/undo';
+
+
 
 import CompSearchButton from './CompSearchButton';
 import CompEditForm from './CompEditForm';
@@ -52,6 +64,8 @@ export default class CompRecambiosProformas extends React.Component {
     , db_delta: null
     , db_changed_rec: false
     , connected: dbConn.isConnected()
+    , msg_visible: false
+    , msg_text: "blah blah"
     };
   }
 
@@ -96,17 +110,17 @@ export default class CompRecambiosProformas extends React.Component {
         if( f.type == 'date' ) {
           var old_value = ns.db_data[ f.field ];
           if( typeof old_value === 'string') {
-            console.log( "Correcting string " + f.field + " date from " + old_value)
+            //console.log( "Correcting string " + f.field + " date from " + old_value)
             let d = new Date( old_value )
-            console.log( "new date_obj " + d)
+            //console.log( "new date_obj " + d)
             let new_value = asYYYYMMDD( d );
-            console.log( "new_value " + new_value)
+            //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           } else {
-            console.log( "Correcting date " + f.field + " date from " + old_value)
+            //console.log( "Correcting date " + f.field + " date from " + old_value)
             let d = new Date( old_value )
             let new_value = asYYYYMMDD( d );
-            console.log( "new_value " + new_value)
+            //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           }
         }
@@ -118,8 +132,8 @@ export default class CompRecambiosProformas extends React.Component {
       ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 )
     }
 
-    console.log( "ns is now")
-    console.log( ns );
+    //console.log( "ns is now")
+    //console.log( ns );
 
     this.setState(ns);
   }
@@ -130,38 +144,53 @@ export default class CompRecambiosProformas extends React.Component {
     this.validateData({db_data:new_db_data});
   }
 
-  onClick( e, dummy  ) {
-    console.log( "onClick---" + e)
+  // --------------------------------------------------------------
+  onClickCancel( e, dummy  ) {
+    console.log( "Restoring...")
+    this.validateData({db_data:this.state.db_orig_data});
+  }
+
+  // --------------------------------------------------------------
+  onClickSave( e, dummy ) {
     if( !this.state.db_changed_rec )
       return;
-    if( e === "Cancel") {
-      console.log( "Restoring...")
-      this.validateData({db_data:this.state.db_orig_data});
-      return;
-    }
-    if( e === "Save") {
-      console.log( "Saving...")
-      var changes = this.state.db_delta;
-      delete changes[ 'IDProforma' ];
-      console.log( changes );
-      dbConn.DBUpdate( '[Recambios - Proformas]'
-                     , changes
-                     , "IDProforma='"+ this.state.db_id + "'"
-                     , this
-                     , (data)=>{
-                      console.log( "Update completed " + this.state.db_id);
-                      console.log( data );
-                      this.onClickSearchResult( this.state.db_id );
-                     } );
-    }
+    console.log( "Saving...")
+    var changes = this.state.db_delta;
+    delete changes[ 'IDProforma' ];
+    console.log( changes );
+    dbConn.DBUpdate( '[Recambios - Proformas]'
+                   , changes
+                   , "IDProforma='"+ this.state.db_id + "'"
+                   , this
+                   , (data)=>{
+                    console.log( "Save completed " + this.state.db_id);
+                    console.log( data );
+                    this.onClickSearchResult( this.state.db_id );
+                    this.setState({msg_visible:true, msg_text:"Registro grabado correctamente"});
+                   } );
+  }
+
+  // --------------------------------------------------------------
+  onClickCopy( ) {
+    console.log( "Copying to clipboard...")
+  }
+
+  // --------------------------------------------------------------
+  onClickPaste( ) {
+    console.log( "Pasting from clipboard...")
+  }
+
+  // --------------------------------------------------------------
+  onClickNew( ) {
+    console.log( "New register...")
+  }
+
+  // --------------------------------------------------------------
+  onClick( e, dummy ) {
+    console.log( "On click..." + e )
   }
 
   // ------------------------------------------------------------------
-  renderSearchButton() {
-    // By nullifying db_id and db_data the component will display the search form again
-    return (<CompSearchButton onClick={this.setState.bind(this, {db_id:null})}/>); 
-  }
-
   renderDisconnected() {
     const style = {
       margin: "auto",
@@ -184,13 +213,14 @@ export default class CompRecambiosProformas extends React.Component {
   renderSaveButton() {
     const buttons_group_style = {float:"right"};
     var changed = this.state.db_changed_rec
-      var search = this.renderSearchButton();
     return (
-      <CardActions expandable={true} style={buttons_group_style}>
-        {search}
-        <RaisedButton disabled={changed} label="New" onClick={this.onClick.bind( "New" )} />
-        <RaisedButton disabled={!changed} label="Save" onClick={this.onClick.bind( this, "Save" )} />
-        <RaisedButton disabled={!changed} label="Cancel" onClick={this.onClick.bind( this, "Cancel" )} />
+      <CardActions expandable style={buttons_group_style}>
+        <IconButton tooltip="Buscar de nuevo" onClick={this.setState.bind(this, {db_id:null})}><ActionSearch/></IconButton>
+        <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
+        <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
+        <IconButton disabled={changed} tooltip="Nuevo Registro" onClick={this.onClickPaste.bind(this)}><ActionNew/></IconButton>
+        <IconButton disabled={!changed} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
+        <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickCancel.bind(this)}><ActionUndo/></IconButton>
       </CardActions> 
     )   
   }
@@ -202,6 +232,16 @@ export default class CompRecambiosProformas extends React.Component {
         onChange={this.onDataChange.bind(this)} 
         onClick={this.onClick.bind(this)} 
         layout={layout}/>);
+  }
+
+  renderSnackBar() {
+    var handler = ()=>{this.setState({msg_visible: false})};
+    return (
+      <Snackbar
+        open={this.state.msg_visible}
+        message={this.state.msg_text}
+        autoHideDuration={1000}
+        onRequestClose={handler}/>);
   }
 
   // ------------------------------------------------------------------
@@ -219,11 +259,11 @@ export default class CompRecambiosProformas extends React.Component {
     }
 
     var save = this.renderSaveButton();
-
+    var msg = this.renderSnackBar();
     var form = this.renderForm();
     var json = JSON.stringify( this.state, null, '  ' );
     console.log( this.state );
-    return (<div>{save}{form}<pre>{json}</pre></div>);
+    return (<div>{save}{form}{msg}<pre>{json}</pre></div>);
   }
 }
 
