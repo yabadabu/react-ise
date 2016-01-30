@@ -27,20 +27,20 @@ export default class CompEditForm extends React.Component {
   handleChange( field, e ) {
     var changed = {};
     changed[field.field] = e.target.value;
-    this.props.onChange( Object.assign( {}, this.props.data, changed))
+    this.props.onChange( Object.assign( {}, this.props.data, changed));
   }
 
   handleAutoCompleteChange( field, new_value ) {
     var changed = {};
     changed[field.field] = new_value;
-    this.props.onChange( Object.assign( {}, this.props.data, changed))
+    this.props.onChange( Object.assign( {}, this.props.data, changed));
   }
 
   handleDateChange( field, this_is_null, new_date ) {
-    console.log( "Ctrl returns " + new_date )
+    console.log( "Ctrl returns " + new_date );
     var changed = {};
     changed[field.field] = new_date; 
-    this.props.onChange( Object.assign( {}, this.props.data, changed))
+    this.props.onChange( Object.assign( {}, this.props.data, changed));
   }
 
   // ---------------------------------------------------------------- 
@@ -49,11 +49,10 @@ export default class CompEditForm extends React.Component {
     if( !this.props.has_changed )
       return "";
     return (
-      <CardActions expandable={true} style={buttons_group_style}>
+      <CardActions expandable style={buttons_group_style}>
         <RaisedButton label="Save" onClick={this.props.onClick.bind( this, "Save" )} />
         <RaisedButton label="Cancel" onClick={this.props.onClick.bind( this, "Cancel" )} />
-      </CardActions> 
-    )   
+      </CardActions>);
   }
 
   // ---------------------------------------------------------------- 
@@ -61,18 +60,20 @@ export default class CompEditForm extends React.Component {
     const cfg = this.props.layout;
     const obj = this.props.data;
 
+    var key = 0;
     var entries = [];
     for( var idx in cfg.fields ) {
+      key++;
       var f = cfg.fields[ idx ];
       if( f.type === "separator" ) {
-        entries.push( <div></div> );
+        entries.push( <div key={key}></div> );
         continue;
       } 
       var value = obj[ f.field ];
 
       if( f.type === "text" ) {
         entries.push( 
-          <span><TextField 
+          <span key={key}><TextField 
             hintText={f.hint}
             floatingLabelText={f.field}
             value={value}
@@ -81,13 +82,14 @@ export default class CompEditForm extends React.Component {
             multiLine={f.multiLine}
             id={f.field}
             onChange={this.handleChange.bind(this,f)}
-            key={idx}/></span>
+            /></span>
           );
 
       } else if( f.type == "action" ) {
 
         entries.push( (
         <ActionSearch 
+            key={key}
             onClick={this.props.onClick.bind( f.field )}
           />) );
 
@@ -97,6 +99,7 @@ export default class CompEditForm extends React.Component {
             floatingLabelText={f.field}
             filter={AutoComplete.caseInsensitiveFilter}
             searchText={value}
+            key={key}
             onUpdateInput={this.handleAutoCompleteChange.bind(this,f)}
             onNewRequest={this.handleAutoCompleteChange.bind(this,f)}
             dataSource={["Barcelona", "Sevilla", "Madrid", "Leon"]}
@@ -105,11 +108,11 @@ export default class CompEditForm extends React.Component {
 
       } else if( f.type == "date" ) {
         var curr_date = new Date( value );
-        console.log( "Rendering date ")
-        console.log( value )
-        console.log( curr_date)
+        //console.log( "Rendering date ")
+        //console.log( value )
+        //console.log( curr_date)
         entries.push( 
-          <div style={f.style}>
+          <div key={key} style={f.style}>
           <DatePicker
             hintText={f.field}
             floatingLabelText={f.field}
@@ -122,9 +125,7 @@ export default class CompEditForm extends React.Component {
             mode="landscape" />
           </div>
           );
-
       }
-
     }
 
     return (<div className={this.props.layout.class_name}>{entries}</div>);

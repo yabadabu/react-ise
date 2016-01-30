@@ -77,70 +77,63 @@ export default class CompSearchDB extends React.Component {
   }  
 
   // -----------------------------------------------
-  getSearchForm() {
+  renderSearchForm() {
     const p = this.props.data;
     const sf = p.search.fuzzy;
-    console.log( p );
-    var entries = [];
 
+    var key = 1000;
+    var entries = [];
     _.map( sf.fields, ( search_fld ) => {
+      key++;
       var fld_name = search_fld.field;
       var fld_style = search_fld.style;
       var idx = _.findIndex( p.fields, (obj)=>{ return obj.field == fld_name; });
       if( idx == -1 ) {
-        entries.push( <div>"Field {fld_name} is not defined in the layout"</div>);
+        entries.push( <div key={key}>"Field {fld_name} is not defined in the layout"</div>);
         return;
       }
       var f = p.fields[ idx ];
       entries.push (
-        <span> &nbsp;&nbsp;
         <TextField 
           hintText={f.hint} 
           floatingLabelText={f.hint}
           value={this.state.searchTerms[f.field]}
           style={fld_style}
           onChange={this.onChangeSearchFld.bind(this,f.field)}
-          key={fld_name}
-          />
-        </span>
-          );
+          key={key}
+          />);
     });
 
     const buttons_group_style = {float:"right"};
     entries.push( 
-    <CardActions expandable style={buttons_group_style}>
+    <CardActions key={"buttons"} style={buttons_group_style}>
       <RaisedButton label="Recientes"/>
-      <RaisedButton label="Nuevo"/>
+      <RaisedButton label="Nuevo" onClick={this.props.onClickNew}/>
     </CardActions>
     );
 
-    var style= {};
-    return (<div style={style}>{entries}</div>);
+    return entries;
   }
 
+  // --------------------------------------------------------------------
+  renderColHeaders() {
+    // Add the table format, we already have the rows contents
+    var col_headers=[];
+    _.each(_.map( this.props.data.search.fuzzy.fields, "field" ), (f)=>{
+      col_headers.push( <th key={f}>{f}</th> );
+    });
+    return (<tr>{col_headers}</tr>);
+  }
 
-  // Do the render in case we must
-  render() {
-    const search_form = this.getSearchForm();
-
-    // Do an extra filter, case insensitive, on each result
-    //var filter = new RegExp(this.state.searchTerm, "i");
+  renderSearchBodyResults() {
     var data_results;
-    console.log( "Showing results" );
-    console.log( this.state.searchResults );
-    console.log( this.props );
-    console.log( this.props.data.layout );
-    if( this.props.data.layout ) {
-      return (<div>"layoutis null!!"</div>);
-    }
 
     var key_field = this.props.data.key_field;
     if( Array.isArray( this.state.searchResults ) ) {
-      var k = 0;
       data_results = this.state.searchResults.map( (row) => {
-        console.log( row );
-        console.log( key_field );
-        console.log( row[key_field] );
+        //console.log( row );
+        //console.log( key_field );
+        //console.log( row[key_field] );
         // Generate an tr entry, binded with the db.id
         // and bind the click to us
 
@@ -153,41 +146,44 @@ export default class CompSearchDB extends React.Component {
           }
           var unique_id = row[key_field];
           return (
-            <tr key={unique_id} onClick={this.onTouchSearchRow.bind(this,unique_id)}>
-            {tds}
-            </tr>
+            <tr key={unique_id} onClick={this.onTouchSearchRow.bind(this,unique_id)}>{tds}</tr>
           );
         }
       });
     }
     if( !data_results || data_results.length == 0 ) {
-      data_results = (<tr key={"empty_results"}><td></td><td>Sin resultados</td></tr>);
+      return (<tr key={"empty_results"}><td></td><td>Sin resultados</td></tr>);
     }
+    return data_results;
+  }
 
-    // Add the table format, we already have the rows contents
-    var col_headers=[];
-    _.each(_.map( this.props.data.search.fuzzy.fields, "field" ), (f)=>{
-      col_headers.push( <th key={f}>{f}</th> );
-    });
-
-    var all_results = (
+  // --------------------------------------------------------------------
+  renderSearchResults() {
+    var headers = this.renderColHeaders();
+    var body = this.renderSearchBodyResults();
+    return (
       <table className="search_results">
-      <colgroup><col width="150px"/></colgroup><tbody>
-      <tr>{col_headers}</tr>
-      {data_results}</tbody>
+<colgroup><col width="150px"/></colgroup>
+      <tbody>
+      {headers}
+      {body}
+      </tbody>
       </table>
     );
+  }
 
-    return (
-      <div>
-      {search_form}
-      {all_results}
-      </div>
-    );
-
+  // --------------------------------------------------------------------
+  // Do the render in case we must
+  render() {
+    const search_form = this.renderSearchForm();
+    // Do an extra filter, case insensitive, on each result
+    //var filter = new RegExp(this.state.searchTerm, "i");
+    const data_results = this.renderSearchResults();
+    return (<div>{search_form}{data_results}</div>);
   }
 }
 
+// --------------------------------------------------------------------
 CompSearchDB.propTypes = {
   data: PropTypes.object.isRequired,
   onClickNew: PropTypes.func,

@@ -19,6 +19,7 @@ class DBConnection extends EventEmitter {
     }
   }
 
+  // ---------------------------------------------------------------
   connectToServer( ) {
     //console.log( "Trying to ws connect...")
     this.connection = new WebSocket('ws://127.0.0.1:1337');
@@ -36,7 +37,7 @@ class DBConnection extends EventEmitter {
     };
     
     this.connection.onmessage = (message) => {
-      console.log( "message from the ws server");
+      //console.log( "message from the ws server");
       try {
         var json = JSON.parse(message.data);
       } catch (e) {
@@ -55,10 +56,12 @@ class DBConnection extends EventEmitter {
     };
   }
 
+  // ---------------------------------------------------------------
   isConnected() {
     return this.is_connected;
   }
 
+  // ---------------------------------------------------------------
   DBSelect( table, fields, filter, callback_ctx, callback ) {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
@@ -67,10 +70,20 @@ class DBConnection extends EventEmitter {
     this.connection.send( JSON.stringify(arg));
   } 
 
+  // ---------------------------------------------------------------
   DBUpdate( table, fields, filter, callback_ctx, callback ) {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
     var arg = {q:"update", table:table, fields:fields, filter:filter };
+    console.log( arg );
+    this.connection.send( JSON.stringify(arg) );
+  } 
+
+  // ---------------------------------------------------------------
+  DBInsert( table, fields, callback_ctx, callback ) {
+    this.callback_ctx = callback_ctx;
+    this.callback = callback;
+    var arg = {q:"insert", table:table, fields:fields };
     console.log( arg );
     this.connection.send( JSON.stringify(arg) );
   } 

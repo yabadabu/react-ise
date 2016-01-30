@@ -4,8 +4,11 @@ import _ from 'lodash';
 import CompSearchDB from './CompSearchDB';
 import dbConn from '../store/db_connection.js';
 import CircularProgress from 'material-ui/lib/circular-progress';
-import getLayout from '../store/db_layouts.js';
+import * as layouts from '../store/db_layouts.js';
 import Snackbar from 'material-ui/lib/snackbar';
+import Divider from 'material-ui/lib/divider';
+import Dialog from 'material-ui/lib/dialog';
+import TextField from 'material-ui/lib/text-field';
 
 import IconButton from 'material-ui/lib/icon-button';
 import ActionSearch from 'material-ui/lib/svg-icons/action/search';
@@ -16,14 +19,12 @@ import ActionNew from 'material-ui/lib/svg-icons/action/open-in-new';
 import ActionSave from 'material-ui/lib/svg-icons/content/save';
 import ActionUndo from 'material-ui/lib/svg-icons/content/undo';
 
-
-
 import CompSearchButton from './CompSearchButton';
 import CompEditForm from './CompEditForm';
 import RaisedButton from 'material-ui/lib/raised-button';
 import CardActions from 'material-ui/lib/card/card-actions';
 
-const layout = getLayout( "proforma" );
+const layout = layouts.get( "proforma" );
 
 function asYYYYMMDD(dt) {
   var r = (1900 + dt.getYear()) + "/";
@@ -43,9 +44,9 @@ function asYYYYMMDD(dt) {
 function getPropertiesOfAChangedFromB( a, b ) {
   if( !a || !b )
     return {};
-  var diffs = {}
+  var diffs = {};
   for( var k in a ) {
-    if( !b[k] || b[k] !== a[k] ) 
+    if( ( typeof b[k] == undefined ) || b[k] !== a[k] ) 
       diffs[k] = b[k];
   }
   return diffs;
@@ -63,9 +64,11 @@ export default class CompRecambiosProformas extends React.Component {
     , db_orig_data: null
     , db_delta: null
     , db_changed_rec: false
+    , db_creating_new: false
     , connected: dbConn.isConnected()
     , msg_visible: false
     , msg_text: "blah blah"
+    , modal_dlg_open: false
     };
   }
 
@@ -82,11 +85,6 @@ export default class CompRecambiosProformas extends React.Component {
     this.setState({connected:dbConn.isConnected()});
   }
 
-  onClickNew( e ) {
-    console.log( "onClickNew" );
-    console.log( e );
-  }
-
   onClickSearchResult( e ) {
     this.setState({db_id: e});
     var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, e );
@@ -97,10 +95,10 @@ export default class CompRecambiosProformas extends React.Component {
                    , resolved_filter
                    , this
                    , (data) => {
-      console.log( "DBSelect" );
-      console.log( data[0] );
-      console.log( this );
-      this.validateData( {db_data: data[0], db_orig_data:data[0]} )
+      //console.log( "DBSelect" );
+      //console.log( data[0] );
+      //console.log( this );
+      this.validateData( {db_data: data[0], db_orig_data:data[0], db_creating_new:false} );
     });      
   }
 
@@ -111,25 +109,25 @@ export default class CompRecambiosProformas extends React.Component {
           var old_value = ns.db_data[ f.field ];
           if( typeof old_value === 'string') {
             //console.log( "Correcting string " + f.field + " date from " + old_value)
-            let d = new Date( old_value )
+            let d = new Date( old_value );
             //console.log( "new date_obj " + d)
             let new_value = asYYYYMMDD( d );
             //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           } else {
             //console.log( "Correcting date " + f.field + " date from " + old_value)
-            let d = new Date( old_value )
+            let d = new Date( old_value );
             let new_value = asYYYYMMDD( d );
             //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           }
         }
-      })
-      var ref = this.state.db_orig_data
+      });
+      var ref = this.state.db_orig_data;
       if( ns.db_orig_data )
         ref = ns.db_orig_data;
       ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
-      ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 )
+      ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
     }
 
     //console.log( "ns is now")
@@ -139,55 +137,80 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   onDataChange( new_db_data ) {
-    console.log( "onDataChange" );
-    console.log( "new_db_data" );
+    //console.log( "onDataChange" );
     this.validateData({db_data:new_db_data});
   }
 
   // --------------------------------------------------------------
   onClickCancel( e, dummy  ) {
-    console.log( "Restoring...")
+    console.log( "Restoring...");
     this.validateData({db_data:this.state.db_orig_data});
   }
 
   // --------------------------------------------------------------
   onClickSave( e, dummy ) {
-    if( !this.state.db_changed_rec )
+    if( !this.state.db_changed_rec && !this.state.db_creating_new )
       return;
-    console.log( "Saving...")
+    console.log( "Saving...");
     var changes = this.state.db_delta;
-    delete changes[ 'IDProforma' ];
     console.log( changes );
-    dbConn.DBUpdate( '[Recambios - Proformas]'
-                   , changes
-                   , "IDProforma='"+ this.state.db_id + "'"
-                   , this
-                   , (data)=>{
-                    console.log( "Save completed " + this.state.db_id);
-                    console.log( data );
-                    this.onClickSearchResult( this.state.db_id );
-                    this.setState({msg_visible:true, msg_text:"Registro grabado correctamente"});
-                   } );
+
+    var handler = 
+      (data)=>{
+        console.log( "Save completed " + this.state.db_id);
+        console.log( data );
+        this.onClickSearchResult( this.state.db_id );
+        this.setState({msg_visible:true, msg_text:"Registro grabado correctamente"});
+       };
+
+    if( this.state.db_creating_new ) {
+      console.log( "Adding new register to the db...");
+      dbConn.DBInsert( layout.table
+                     , changes
+                     , this
+                     , handler );
+    } else {
+      delete changes[ 'IDProforma' ];
+      dbConn.DBUpdate( layout.table
+                     , changes
+                     , "IDProforma='"+ this.state.db_id + "'"
+                     , this
+                     , handler );
+    }
+
+  }
+  // --------------------------------------------------------------
+  onClickNew( ) {
+    console.log( "New register...");
+    const new_db_data = layouts.getNewEmptyRegister( layout );
+    const new_db_orig_data = layouts.getObjectWithNullFields( layout );
+    this.validateData( 
+      { db_data: new_db_data
+      , db_orig_data:new_db_orig_data
+      , db_id:"new"
+      , db_creating_new:true
+      });
+  }
+
+  // --------------------------------------------------------------
+  onClickDelete( ) {
+    this.setState({modal_dlg_open:true}, {modal_dlg_msg:"¿Borrar completamente el registro?"});
   }
 
   // --------------------------------------------------------------
   onClickCopy( ) {
-    console.log( "Copying to clipboard...")
+    console.log( "Copying to clipboard...");
   }
 
   // --------------------------------------------------------------
   onClickPaste( ) {
-    console.log( "Pasting from clipboard...")
+    console.log( "Pasting from clipboard...");
   }
 
-  // --------------------------------------------------------------
-  onClickNew( ) {
-    console.log( "New register...")
-  }
 
   // --------------------------------------------------------------
   onClick( e, dummy ) {
-    console.log( "On click..." + e )
+    console.log( "On click..." + e );
   }
 
   // ------------------------------------------------------------------
@@ -209,20 +232,25 @@ export default class CompRecambiosProformas extends React.Component {
     //return (<div>You are searching <pre>{code}</pre></div>);
   }
 
+  renderSearchButton( ) {
+    return (<IconButton tooltip="Buscar de nuevo" onClick={this.setState.bind(this, {db_id:null})}><ActionSearch/></IconButton>);
+  }
+
   // ---------------------------------------------------------------- 
   renderSaveButton() {
     const buttons_group_style = {float:"right"};
-    var changed = this.state.db_changed_rec
+    var changed = this.state.db_changed_rec;
+    var is_new = this.state.db_creating_new;
     return (
       <CardActions expandable style={buttons_group_style}>
         <IconButton tooltip="Buscar de nuevo" onClick={this.setState.bind(this, {db_id:null})}><ActionSearch/></IconButton>
         <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
         <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
-        <IconButton disabled={changed} tooltip="Nuevo Registro" onClick={this.onClickPaste.bind(this)}><ActionNew/></IconButton>
-        <IconButton disabled={!changed} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
+        <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
+        <IconButton disabled={!changed && !is_new} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
         <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickCancel.bind(this)}><ActionUndo/></IconButton>
-      </CardActions> 
-    )   
+        <IconButton disabled={!changed} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
+      </CardActions>);
   }
 
   renderForm() {
@@ -235,13 +263,29 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   renderSnackBar() {
-    var handler = ()=>{this.setState({msg_visible: false})};
+    var handler = ()=>{this.setState({msg_visible: false});};
     return (
       <Snackbar
         open={this.state.msg_visible}
         message={this.state.msg_text}
         autoHideDuration={1000}
         onRequestClose={handler}/>);
+  }
+
+  renderModalDialog() {
+    var handler_no = ()=>{this.setState({modal_dlg_open: false});};
+    var handler_yes = ()=>{this.setState({modal_dlg_open: false});};
+    var actions = (
+      <CardActions >
+      <RaisedButton label="No" onClick={handler_no}/>
+      <RaisedButton label="Yes" onClick={handler_yes}/>
+      </CardActions>);
+    return (<Dialog
+          title={this.state.modal_dlg_msg}
+          modal
+          actions={actions}
+          open={this.state.modal_dlg_open}
+          />);   
   }
 
   // ------------------------------------------------------------------
@@ -258,12 +302,13 @@ export default class CompRecambiosProformas extends React.Component {
       return (<div>{search}Retrieving data from {this.state.db_id}</div>);
     }
 
+    var dlg = this.renderModalDialog();
     var save = this.renderSaveButton();
     var msg = this.renderSnackBar();
     var form = this.renderForm();
     var json = JSON.stringify( this.state, null, '  ' );
-    console.log( this.state );
-    return (<div>{save}{form}{msg}<pre>{json}</pre></div>);
+    //console.log( this.state );
+    return (<div>{save}{form}<Divider />{msg}{dlg}<pre>{json}</pre></div>);
   }
 }
 

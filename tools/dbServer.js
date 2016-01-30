@@ -97,6 +97,29 @@ function genUpdateSQL( table, fields, filter ) {
   return sql;
 }
 
+
+function genInsertSQL( table, fields ) {
+  console.log( "genInsertSQL" )
+  console.log( table )
+  console.log( fields )
+
+  var field_names = []
+  var field_values = []
+  for( var f in fields ) {
+    var value = fields[f];
+    if( Array.isArray( value ) )
+      continue;
+    field_names.push( f );
+    if( value == null )
+      field_values.push( value );
+    else
+      field_values.push( quoted( value ) );
+  }
+  sql = "INSERT INTO " + table + " (" + field_names.join(", ") + ") VALUES (" + field_values.join(", ") + ")";
+  return sql;
+}
+
+
 // ----------------------------------------------------------
 function execRequest( inmsg, request_callback ) {
   var tasks= [];
@@ -120,6 +143,10 @@ function execRequest( inmsg, request_callback ) {
 
   else if( inmsg.q === "update" ) {
     tasks.push( { sql: genUpdateSQL( inmsg.table, inmsg.fields, inmsg.filter ) } );
+  } 
+
+  else if( inmsg.q === "insert" ) {
+    tasks.push( { sql: genInsertSQL( inmsg.table, inmsg.fields ) } );
   } 
 
   else if( inmsg.q === "rawSql" ) {

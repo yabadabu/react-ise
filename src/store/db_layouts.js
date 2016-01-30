@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const all_layouts = {
   proforma: {
     class_name: "proforma",
@@ -35,6 +37,35 @@ const all_layouts = {
   }
 };
 
-export default function getLayout( name ) {
+export function get( name ) {
   return all_layouts[name];
 }
+
+export function getNewEmptyRegister( layout ) {
+  console.log( "getNewEmptyRegister");
+  var data = {};
+  _.each( layout.fields, (f)=>{
+    if( f.field ) {
+      if( f.type == "date") {
+        data[f.field] = new Date();
+      } else {
+        data[f.field] = "New";
+      }
+    } 
+  });
+  console.log( data );
+  return data;
+}
+
+export function getObjectWithNullFields( layout ) {
+  var data = {};
+  _.each( layout.fields, (f)=>{
+    if( f.field ) 
+      data[f.field] = null;
+  });
+  return data;
+}
+
+
+
+
