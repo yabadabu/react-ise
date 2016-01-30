@@ -207,6 +207,10 @@ export default class CompRecambiosProformas extends React.Component {
     console.log( "Pasting from clipboard...");
   }
 
+  // --------------------------------------------------------------
+  onClickSearchAgain() {
+    this.setState( {db_id:null} );
+  }
 
   // --------------------------------------------------------------
   onClick( e, dummy ) {
@@ -232,8 +236,9 @@ export default class CompRecambiosProformas extends React.Component {
     //return (<div>You are searching <pre>{code}</pre></div>);
   }
 
+  // ---------------------------------------------------------------- 
   renderSearchButton( ) {
-    return (<IconButton tooltip="Buscar de nuevo" onClick={this.setState.bind(this, {db_id:null})}><ActionSearch/></IconButton>);
+    return (<IconButton tooltip="Buscar de nuevo" onClick={this.onClickSearchAgain.bind(this)}><ActionSearch/></IconButton>);
   }
 
   // ---------------------------------------------------------------- 
@@ -243,7 +248,7 @@ export default class CompRecambiosProformas extends React.Component {
     var is_new = this.state.db_creating_new;
     return (
       <CardActions expandable style={buttons_group_style}>
-        <IconButton tooltip="Buscar de nuevo" onClick={this.setState.bind(this, {db_id:null})}><ActionSearch/></IconButton>
+        <IconButton tooltip="Buscar de nuevo" onClick={this.onClickSearchAgain.bind(this)}><ActionSearch/></IconButton>
         <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
         <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
         <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
