@@ -8,8 +8,8 @@ import getLayout from '../store/db_layouts.js';
 
 import CompSearchButton from './CompSearchButton';
 import CompEditForm from './CompEditForm';
-
-//import RefreshIndicator from 'material-ui/lib/refresh-indicator';
+import RaisedButton from 'material-ui/lib/raised-button';
+import CardActions from 'material-ui/lib/card/card-actions';
 
 const layout = getLayout( "proforma" );
 
@@ -28,6 +28,18 @@ function asYYYYMMDD(dt) {
   return r;
 }
 
+function getPropertiesOfAChangedFromB( a, b ) {
+  if( !a || !b )
+    return {};
+  var diffs = {}
+  for( var k in a ) {
+    if( !b[k] || b[k] !== a[k] ) 
+      diffs[k] = b[k];
+  }
+  return diffs;
+}
+
+
 // -----------------------------------------------------------------
 export default class CompRecambiosProformas extends React.Component {
   
@@ -36,6 +48,9 @@ export default class CompRecambiosProformas extends React.Component {
     this.state = {
       db_id:   null
     , db_data: null
+    , db_orig_data: null
+    , db_delta: null
+    , db_changed_rec: false
     , connected: dbConn.isConnected()
     };
   }
@@ -71,7 +86,7 @@ export default class CompRecambiosProformas extends React.Component {
       console.log( "DBSelect" );
       console.log( data[0] );
       console.log( this );
-      this.validateData( {db_data: data[0]} )
+      this.validateData( {db_data: data[0], db_orig_data:data[0]} )
     });      
   }
 
@@ -96,7 +111,16 @@ export default class CompRecambiosProformas extends React.Component {
           }
         }
       })
+      var ref = this.state.db_orig_data
+      if( ns.db_orig_data )
+        ref = ns.db_orig_data;
+      ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
+      ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 )
     }
+
+    console.log( "ns is now")
+    console.log( ns );
+
     this.setState(ns);
   }
 
@@ -106,25 +130,30 @@ export default class CompRecambiosProformas extends React.Component {
     this.validateData({db_data:new_db_data});
   }
 
-  onClick( e ) {
-    console.log( "onClick")
-    console.log( this )
-    console.log( e )
-    var rec = this.state.db_data;
-    delete rec[ 'IDProforma' ];
-    /*
-    var changes = {};
-    changes["Poblacion"] = rec.Poblacion
-    changes["NIF"] = rec.NIF
-    changes["CP"] = rec.CP
-    changes["Calle"] = rec.Calle
-    changes["Provincia"] = rec.Provincia
-    changes["Notas"] = rec.Notas
-    changes["Fecha"] = rec.Fecha
-    */
-    var changes = rec;
-    console.log( changes );
-    dbConn.DBUpdate( '[Recambios - Proformas]', changes, "IDProforma='"+ this.state.db_id + "'" );
+  onClick( e, dummy  ) {
+    console.log( "onClick---" + e)
+    if( !this.state.db_changed_rec )
+      return;
+    if( e === "Cancel") {
+      console.log( "Restoring...")
+      this.validateData({db_data:this.state.db_orig_data});
+      return;
+    }
+    if( e === "Save") {
+      console.log( "Saving...")
+      var changes = this.state.db_delta;
+      delete changes[ 'IDProforma' ];
+      console.log( changes );
+      dbConn.DBUpdate( '[Recambios - Proformas]'
+                     , changes
+                     , "IDProforma='"+ this.state.db_id + "'"
+                     , this
+                     , (data)=>{
+                      console.log( "Update completed " + this.state.db_id);
+                      console.log( data );
+                      this.onClickSearchResult( this.state.db_id );
+                     } );
+    }
   }
 
   // ------------------------------------------------------------------
@@ -151,6 +180,21 @@ export default class CompRecambiosProformas extends React.Component {
     //return (<div>You are searching <pre>{code}</pre></div>);
   }
 
+  // ---------------------------------------------------------------- 
+  renderSaveButton() {
+    const buttons_group_style = {float:"right"};
+    var changed = this.state.db_changed_rec
+      var search = this.renderSearchButton();
+    return (
+      <CardActions expandable={true} style={buttons_group_style}>
+        {search}
+        <RaisedButton disabled={changed} label="New" onClick={this.onClick.bind( "New" )} />
+        <RaisedButton disabled={!changed} label="Save" onClick={this.onClick.bind( this, "Save" )} />
+        <RaisedButton disabled={!changed} label="Cancel" onClick={this.onClick.bind( this, "Cancel" )} />
+      </CardActions> 
+    )   
+  }
+
   renderForm() {
     return(
       <CompEditForm 
@@ -169,14 +213,17 @@ export default class CompRecambiosProformas extends React.Component {
     if( !this.state.db_id )
       return this.renderSearchForm();
 
-    var search = this.renderSearchButton();
-    if( !this.state.db_data )
+    if( !this.state.db_data ) {
+      var search = this.renderSearchButton();
       return (<div>{search}Retrieving data from {this.state.db_id}</div>);
+    }
+
+    var save = this.renderSaveButton();
 
     var form = this.renderForm();
-    var json = JSON.stringify( this.state.db_data, null, '  ' );
+    var json = JSON.stringify( this.state, null, '  ' );
     console.log( this.state );
-    return (<div>{search}{form}<pre>{json}</pre></div>);
+    return (<div>{save}{form}<pre>{json}</pre></div>);
   }
 }
 

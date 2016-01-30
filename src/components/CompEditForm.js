@@ -46,14 +46,12 @@ export default class CompEditForm extends React.Component {
   // ---------------------------------------------------------------- 
   renderButtons() {
     const buttons_group_style = {float:"right"};
+    if( !this.props.has_changed )
+      return "";
     return (
       <CardActions expandable={true} style={buttons_group_style}>
-        <RaisedButton label="Cancel"
-                      onClick={this.props.onClick.bind( this, "Cancel" )}
-        />
-        <RaisedButton label="Save" primary={true}
-                      onClick={this.props.onClick.bind( this, "Save" )}
-        />
+        <RaisedButton label="Save" onClick={this.props.onClick.bind( this, "Save" )} />
+        <RaisedButton label="Cancel" onClick={this.props.onClick.bind( this, "Cancel" )} />
       </CardActions> 
     )   
   }
@@ -129,7 +127,6 @@ export default class CompEditForm extends React.Component {
 
     }
 
-    entries.push( this.renderButtons() );
     return (<div className={this.props.layout.class_name}>{entries}</div>);
   }
 }
@@ -138,5 +135,6 @@ CompEditForm.propTypes = {
   data:     PropTypes.object.isRequired,
   layout:   PropTypes.object.isRequired,
   onClick:  PropTypes.func,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  has_changed: PropTypes.bool
 };

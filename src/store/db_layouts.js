@@ -19,12 +19,12 @@ const all_layouts = {
       }
     },
     fields: [
-      { field:"Search", type:"action", hint:"Buscar una empresa" },
-      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true },
+      //{ field:"Search", type:"action", hint:"Buscar una empresa" },
+      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"10%"} },
       { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"50%"} },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
-      { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"80px" }, style:{display:"inline-block" } },
       { type:"separator"} ,
+      { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
       { field:"Calle", type:"text", style:{ width:"30%" } },
       { field:"Poblacion", type:"text", style:{ width:"30%" } },
       { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
