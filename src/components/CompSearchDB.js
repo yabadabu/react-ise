@@ -10,10 +10,13 @@ export default class CompSearchDB extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      searchTerms: {}       // Current terms to search
-    , searchResults: []     // Current results recovered
-    };
+    let init_state = props.search_state;
+    if( init_state == null ) init_state = {};
+    if( init_state.searchTerms == null )
+      init_state.searchTerms = {};
+    if( init_state.searchResults == null )
+      init_state.searchResults = [];
+    this.state = init_state;
   }
 
   // When the search field changed and we have enough characters
@@ -73,7 +76,7 @@ export default class CompSearchDB extends React.Component {
   onTouchSearchRow(id) {
     //console.log( id );
     // Notify we start searching for item with ID id
-    this.props.onClickSearchResult( id, null );
+    this.props.onClickSearchResult( id, this.state, null );
   }  
 
   // -----------------------------------------------
@@ -186,6 +189,7 @@ export default class CompSearchDB extends React.Component {
 // --------------------------------------------------------------------
 CompSearchDB.propTypes = {
   data: PropTypes.object.isRequired,
+  search_state: PropTypes.object,
   onClickNew: PropTypes.func,
   onClickSearchResult: PropTypes.func.isRequired
 };

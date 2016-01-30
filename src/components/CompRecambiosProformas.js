@@ -69,6 +69,7 @@ export default class CompRecambiosProformas extends React.Component {
     , msg_visible: false
     , msg_text: "blah blah"
     , modal_dlg_open: false
+    , search_state: null
     };
   }
 
@@ -85,7 +86,7 @@ export default class CompRecambiosProformas extends React.Component {
     this.setState({connected:dbConn.isConnected()});
   }
 
-  onClickSearchResult( e ) {
+  onClickSearchResult( e, search_state ) {
     this.setState({db_id: e});
     var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, e );
     console.log( "onClickSearchResult" );
@@ -98,7 +99,7 @@ export default class CompRecambiosProformas extends React.Component {
       //console.log( "DBSelect" );
       //console.log( data[0] );
       //console.log( this );
-      this.validateData( {db_data: data[0], db_orig_data:data[0], db_creating_new:false} );
+      this.validateData( {db_data: data[0], db_orig_data:data[0], db_creating_new:false, search_state:search_state} );
     });      
   }
 
@@ -232,6 +233,7 @@ export default class CompRecambiosProformas extends React.Component {
         data={layout} 
         onClickNew={this.onClickNew.bind(this)}
         onClickSearchResult={this.onClickSearchResult.bind(this)}
+        search_state={this.state.search_state}
         />);
     //return (<div>You are searching <pre>{code}</pre></div>);
   }
