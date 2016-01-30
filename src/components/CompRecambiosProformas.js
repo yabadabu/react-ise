@@ -171,10 +171,10 @@ export default class CompRecambiosProformas extends React.Component {
                      , this
                      , handler );
     } else {
-      delete changes[ 'IDProforma' ];
+      delete changes[ layout.key_field ];
       dbConn.DBUpdate( layout.table
                      , changes
-                     , "IDProforma='"+ this.state.db_id + "'"
+                     , layout.key_field + "='"+ this.state.db_id + "'"
                      , this
                      , handler );
     }
