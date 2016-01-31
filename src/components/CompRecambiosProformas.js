@@ -184,7 +184,9 @@ export default class CompRecambiosProformas extends React.Component {
        };
 
     if( this.state.db_creating_new ) {
-      console.log( "Adding new register to the db...");
+      const new_id = changes[ layout.key_field ];
+      console.log( "Adding new register to the db... " + new_id);
+      this.setState({db_id:new_id});
       dbConn.DBInsert( layout.table
                      , changes
                      , this
