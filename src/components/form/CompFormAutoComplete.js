@@ -27,7 +27,7 @@ const CompFormAutoComplete = (props) => {
 
 CompFormAutoComplete.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.object.isRequired,
+  value: PropTypes.string,
   key: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired
 };

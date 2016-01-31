@@ -26,21 +26,6 @@ import CardActions from 'material-ui/lib/card/card-actions';
 
 const layout = layouts.get( "proforma" );
 
-function asYYYYMMDD(dt) {
-  var r = (1900 + dt.getYear()) + "/";
-  var m = 1 + dt.getMonth();
-  var d = dt.getDate();
-  if( m < 10 ) 
-    r += "0" + m;
-  else
-    r += m;
-  if( d < 10 )
-    r += "/0" + d;
-  else
-    r += "/" + d;
-  return r;
-}
-
 function getPropertiesOfAChangedFromB( a, b ) {
   if( !a || !b )
     return {};
@@ -51,7 +36,6 @@ function getPropertiesOfAChangedFromB( a, b ) {
   }
   return diffs;
 }
-
 
 // -----------------------------------------------------------------
 export default class CompRecambiosProformas extends React.Component {
@@ -89,7 +73,7 @@ export default class CompRecambiosProformas extends React.Component {
   // e is the unique id of the selected row in the comp search results
   onClickSearchResult( e, search_state ) {
     console.log( "onClickSearchResult" );
-    this.setState({db_id: e, db_data:null});
+    this.setState({db_id:e});
 
     // Prepare the main query and the subqueries
     var db_all_results = {};
@@ -167,13 +151,13 @@ export default class CompRecambiosProformas extends React.Component {
             //console.log( "Correcting string " + f.field + " date from " + old_value)
             let d = new Date( old_value );
             //console.log( "new date_obj " + d)
-            let new_value = asYYYYMMDD( d );
+            let new_value = layouts.asYYYYMMDD( d );
             //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           } else {
             //console.log( "Correcting date " + f.field + " date from " + old_value)
             let d = new Date( old_value );
-            let new_value = asYYYYMMDD( d );
+            let new_value = layouts.asYYYYMMDD( d );
             //console.log( "new_value " + new_value)
             ns.db_data[ f.field ] = new_value;
           }
@@ -239,7 +223,7 @@ export default class CompRecambiosProformas extends React.Component {
   onClickNew( ) {
     console.log( "New register...");
     const new_db_data = layouts.getNewEmptyRegister( layout );
-    const new_db_orig_data = layouts.getObjectWithNullFields( layout );
+    const new_db_orig_data = new_db_data;
     this.validateData( 
       { db_data: new_db_data
       , db_orig_data:new_db_orig_data
@@ -321,7 +305,9 @@ export default class CompRecambiosProformas extends React.Component {
         data={this.state.db_data} 
         onChange={this.onDataChange.bind(this)} 
         onClick={this.onClick.bind(this)} 
-        layout={layout}/>);
+        layout={layout}
+        creating_new={this.state.db_creating_new}
+        />);
   }
 
   renderSnackBar() {

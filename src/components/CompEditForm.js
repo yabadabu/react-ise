@@ -37,7 +37,7 @@ export default class CompEditForm extends React.Component {
     const cfg = this.props.layout;
     const obj = this.props.data;
 
-    let key = 0;
+    var key = 0;
     let entries = [];
     for( let idx in cfg.fields ) {
       key++;
@@ -64,9 +64,10 @@ export default class CompEditForm extends React.Component {
         );
 
       } else if( f.type == "array_table" ) {
-        entries.push(
-          <CompFormTable field={f} value={value} key={key}/>
-        );
+        if( !this.props.creating_new )
+          entries.push(
+            <CompFormTable field={f} value={value} key={key}/>
+          );
 
       } else if( f.type == "action" ) {
         entries.push( (
@@ -86,5 +87,6 @@ CompEditForm.propTypes = {
   layout:   PropTypes.object.isRequired,
   onClick:  PropTypes.func,
   onChange: PropTypes.func,
+  creating_new: PropTypes.bool, 
   has_changed: PropTypes.bool
 };

@@ -60,7 +60,7 @@ const CompFormTable = (props) => {
 
 CompFormTable.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.object.isRequired,
+  value: PropTypes.array.isRequired,
   key: PropTypes.number.isRequired
 };
 

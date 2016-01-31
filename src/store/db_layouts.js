@@ -66,27 +66,34 @@ export function getFieldByname( layout, field_name ) {
   return undefined;
 }
 
+export function asYYYYMMDD(dt) {
+  var r = (1900 + dt.getYear()) + "/";
+  var m = 1 + dt.getMonth();
+  var d = dt.getDate();
+  if( m < 10 ) 
+    r += "0" + m;
+  else
+    r += m;
+  if( d < 10 )
+    r += "/0" + d;
+  else
+    r += "/" + d;
+  return r;
+}
+
 export function getNewEmptyRegister( layout ) {
-  console.log( "getNewEmptyRegister");
   var data = {};
   _.each( layout.fields, (f)=>{
     if( f.field ) {
-      if( f.type == "date") {
-        data[f.field] = new Date();
-      } else {
-        data[f.field] = "New";
-      }
+      if( f.type == "date") 
+        data[f.field] = asYYYYMMDD( new Date() );
+      else if( f.type == "array_table") 
+        data[f.field] = [];
+      else if( f.type == "provincia")
+        data[f.field] = "";
+      else 
+        data[f.field] = null;
     } 
-  });
-  console.log( data );
-  return data;
-}
-
-export function getObjectWithNullFields( layout ) {
-  var data = {};
-  _.each( layout.fields, (f)=>{
-    if( f.field ) 
-      data[f.field] = null;
   });
   return data;
 }

@@ -23,7 +23,7 @@ const CompFormText = (props) => {
 
 CompFormText.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.object.isRequired,
+  value: PropTypes.string,
   key: PropTypes.number.isRequired,
   inside_table: PropTypes.bool,
   onChange: PropTypes.func.isRequired
