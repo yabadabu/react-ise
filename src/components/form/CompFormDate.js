@@ -13,7 +13,6 @@ const CompFormDate = (props) => {
     <DatePicker
       hintText={f.field}
       className="form_input"
-      key={props.key} 
       floatingLabelText={f.field}
       autoOk
       textFieldStyle={f.textstyle}
@@ -22,14 +21,12 @@ const CompFormDate = (props) => {
       value={curr_date}
       mode="landscape" 
       onChange={props.onChange}
-      />
-  );
+      />);
 };
 
 CompFormDate.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.object.isRequired,
-  key: PropTypes.number.isRequired,
+  value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired
 };
 

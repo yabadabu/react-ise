@@ -16,7 +16,6 @@ const CompFormText = (props) => {
   }
   return (
     <TextField 
-      key={props.key}
       className="form_input"
       hintText={f.hint}
       floatingLabelText={label}
@@ -34,8 +33,10 @@ const CompFormText = (props) => {
 
 CompFormText.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.string,
-  key: PropTypes.number.isRequired,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+    ]),
   inside_table: PropTypes.bool,
   creating_new: PropTypes.bool,
   onChange: PropTypes.func.isRequired

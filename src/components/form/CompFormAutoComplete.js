@@ -14,7 +14,6 @@ const CompFormAutoComplete = (props) => {
   const f         = props.field;
   return (
     <AutoComplete
-      key={props.key}
       floatingLabelText={f.field}
       filter={AutoComplete.caseInsensitiveFilter}
       searchText={props.value}
@@ -28,7 +27,6 @@ const CompFormAutoComplete = (props) => {
 CompFormAutoComplete.propTypes = {
   field: PropTypes.object.isRequired,
   value: PropTypes.string,
-  key: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired
 };
 

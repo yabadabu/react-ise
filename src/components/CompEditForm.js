@@ -54,7 +54,7 @@ export default class CompEditForm extends React.Component {
     const cfg = this.props.layout;
     const obj = this.props.data;
 
-    var key = 0;
+    var key = 1;
     let entries = [];
     for( let idx in cfg.fields ) {
       key++;
@@ -86,8 +86,9 @@ export default class CompEditForm extends React.Component {
         entries.push(
           <CompFormTable field={f} value={value} key={key} onChange={this.handleTableChange.bind(this,f)}/>
         );
+        key++;
         entries.push( 
-          <CardActions >
+          <CardActions key={key} >
           <RaisedButton label="New Detail" />
           </CardActions>);
 
@@ -100,7 +101,8 @@ export default class CompEditForm extends React.Component {
       }
     }
 
-    return (<div className={this.props.layout.class_name}>{entries}</div>);
+    key++;
+    return (<div key={key} className={this.props.layout.class_name}>{entries}</div>);
   }
 }
 
