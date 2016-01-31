@@ -29,7 +29,7 @@ export default class CompEditForm extends React.Component {
     this.handleHandle( field, new_value); 
   }
   handleDateChange( field, this_is_null, new_date ) {
-    this.handleHandle( field, new_date); 
+    this.handleHandle( field, layouts.asYYYYMMDD( new_date )); 
   }
 
   // ---------------------------------------------------------------- 

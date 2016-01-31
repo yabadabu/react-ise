@@ -81,6 +81,29 @@ export function asYYYYMMDD(dt) {
   return r;
 }
 
+export function validateDates( layout, obj ) {
+
+  _.each( layout.fields, (f)=>{
+    if( f.type === "date") {
+      var old_value = obj[ f.field ];
+      if( typeof old_value === 'string') {
+        //console.log( "Correcting string " + f.field + " date from " + old_value)
+        let d = new Date( old_value );
+        //console.log( "new date_obj " + d)
+        let new_value = asYYYYMMDD( d );
+        //console.log( "new_value " + new_value)
+        obj[ f.field ] = new_value;
+      } else {
+        //console.log( "Correcting date " + f.field + " date from " + old_value)
+        let d = new Date( old_value );
+        let new_value = asYYYYMMDD( d );
+        //console.log( "new_value " + new_value)
+        obj[ f.field ] = new_value;
+      }
+    }
+  })
+}
+
 export function getNewEmptyRegister( layout ) {
   var data = {};
   _.each( layout.fields, (f)=>{

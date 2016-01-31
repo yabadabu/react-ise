@@ -144,35 +144,15 @@ export default class CompRecambiosProformas extends React.Component {
 
   validateData( ns ) {
     if( ns.db_data ) {
-      _.each( layout.fields, (f)=>{
-        if( f.type == 'date' ) {
-          var old_value = ns.db_data[ f.field ];
-          if( typeof old_value === 'string') {
-            //console.log( "Correcting string " + f.field + " date from " + old_value)
-            let d = new Date( old_value );
-            //console.log( "new date_obj " + d)
-            let new_value = layouts.asYYYYMMDD( d );
-            //console.log( "new_value " + new_value)
-            ns.db_data[ f.field ] = new_value;
-          } else {
-            //console.log( "Correcting date " + f.field + " date from " + old_value)
-            let d = new Date( old_value );
-            let new_value = layouts.asYYYYMMDD( d );
-            //console.log( "new_value " + new_value)
-            ns.db_data[ f.field ] = new_value;
-          }
-        }
-      });
+      layouts.validateDates( layout, ns.db_data );
       var ref = this.state.db_orig_data;
       if( ns.db_orig_data )
         ref = ns.db_orig_data;
       ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
       ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
     }
-
     //console.log( "ns is now")
     //console.log( ns );
-
     this.setState(ns);
   }
 
