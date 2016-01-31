@@ -10,7 +10,7 @@ const all_layouts = {
       fuzzy: {
         fields: [
           { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'" },
-          { field:"Empresa", style:{width:"70%"}, filter:"Empresa like '%__FIELD__%'" }
+          { field:"Empresa", style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'" }
         ],
         title: 'Número de la Proforma',
         min_num_chars: 3      // to fire the trigger

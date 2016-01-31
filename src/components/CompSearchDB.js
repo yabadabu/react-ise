@@ -22,13 +22,13 @@ export default class CompSearchDB extends React.Component {
   // When the search field changed and we have enough characters
   // then we start a search in the db
   onChangeSearchFld(field, e) {
-    console.log( "onChangeSearchFld" );
-    console.log( field );
-    console.log( e );
+    //console.log( "onChangeSearchFld" );
+    //console.log( field );
+    //console.log( e );
     var new_value = e.target.value;
     var new_state = this.state;
     new_state.searchTerms[field] = new_value;
-    console.log( new_state );
+    //console.log( new_state );
     this.setState(new_state);
 
     if( new_value.length >= this.props.data.search.fuzzy.min_num_chars ) 
@@ -37,8 +37,8 @@ export default class CompSearchDB extends React.Component {
 
   // ----------------------------------------------------------
   requestDataToDB() {
-    console.log( "requestDataToDB" );
-    console.log( this.state );
+    //console.log( "requestDataToDB" );
+    //console.log( this.state );
 
     var layout = this.props.data;
     var fields_defs = layout.search.fuzzy.fields;
@@ -50,10 +50,10 @@ export default class CompSearchDB extends React.Component {
       //console.log( f )
       if( this.state.searchTerms[f.field] ) {
         var resolved_filter = f.filter.replace( /__FIELD__/, this.state.searchTerms[f.field] );
-        console.log( resolved_filter );
+        //console.log( resolved_filter );
         filters.push( resolved_filter );
       } else {
-        console.log( "Filter " + f.field + " term is empty");
+        //console.log( "Filter " + f.field + " term is empty");
       }
     }
     var all_filters = filters.join( " AND ");
@@ -98,12 +98,12 @@ export default class CompSearchDB extends React.Component {
       var f = p.fields[ idx ];
       entries.push (
         <TextField 
+          key={key}
           hintText={f.hint} 
           floatingLabelText={f.hint}
           value={this.state.searchTerms[f.field]}
           style={fld_style}
           onChange={this.onChangeSearchFld.bind(this,f.field)}
-          key={key}
           />);
     });
 
@@ -115,7 +115,7 @@ export default class CompSearchDB extends React.Component {
     </CardActions>
     );
 
-    return entries;
+    return (<div key="search_form">{entries}</div>);
   }
 
   // --------------------------------------------------------------------
@@ -125,15 +125,17 @@ export default class CompSearchDB extends React.Component {
     _.each(_.map( this.props.data.search.fuzzy.fields, "field" ), (f)=>{
       col_headers.push( <th key={f}>{f}</th> );
     });
-    return (<tr>{col_headers}</tr>);
+    return (<tr key="col_headers">{col_headers}</tr>);
   }
 
   renderSearchBodyResults() {
     var data_results;
+    var key = 0;
 
     var key_field = this.props.data.key_field;
     if( Array.isArray( this.state.searchResults ) ) {
       data_results = this.state.searchResults.map( (row) => {
+        key++;
         //console.log( row );
         //console.log( key_field );
         //console.log( row[key_field] );
@@ -145,11 +147,12 @@ export default class CompSearchDB extends React.Component {
           var tds = [];
           for( var fld in row ) {
             var value = row[fld];
-            tds.push( <td>{value}</td> );
+            tds.push( <td key={key}>{value}</td> );
+            key++;
           }
           var unique_id = row[key_field];
           return (
-            <tr key={unique_id} onClick={this.onTouchSearchRow.bind(this,unique_id)}>{tds}</tr>
+            <tr key={key} onClick={this.onTouchSearchRow.bind(this,unique_id)}>{tds}</tr>
           );
         }
       });
@@ -165,8 +168,8 @@ export default class CompSearchDB extends React.Component {
     var headers = this.renderColHeaders();
     var body = this.renderSearchBodyResults();
     return (
-      <table className="search_results">
-<colgroup><col width="150px"/></colgroup>
+      <table key="search_results" className="search_results">
+      <colgroup><col width="150px"/></colgroup>
       <tbody>
       {headers}
       {body}
@@ -182,7 +185,7 @@ export default class CompSearchDB extends React.Component {
     // Do an extra filter, case insensitive, on each result
     //var filter = new RegExp(this.state.searchTerm, "i");
     const data_results = this.renderSearchResults();
-    return (<div>{search_form}{data_results}</div>);
+    return (<div >{search_form}{data_results}</div>);
   }
 }
 

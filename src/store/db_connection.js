@@ -8,6 +8,7 @@ class DBConnection extends EventEmitter {
     this.callback_ctx = null;
     this.callback = null;
     this.is_connected = false;
+    this.trace = false;
     this.connectToServer();
   }
 
@@ -32,7 +33,6 @@ class DBConnection extends EventEmitter {
 
     this.connection.onclose = () => {
       this.disconnect();
-      //this.is_connected = false;
       setTimeout( this.connectToServer(this), 3000 );
     };
     
@@ -44,7 +44,7 @@ class DBConnection extends EventEmitter {
         console.log('Server answered something that doesn\'t look like a valid JSON: ', message.data);
         return;
       }
-      //console.log( json );
+      if( this.trace ) console.log( json );
       if( this.callback ) 
         this.callback.call( this.callback_ctx, json.data );
     };
@@ -66,7 +66,7 @@ class DBConnection extends EventEmitter {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
     var arg = {q:"select", fields:fields, table:table, filter:filter };
-    console.log( arg );
+    if( this.trace ) console.log( arg );
     this.connection.send( JSON.stringify(arg));
   } 
 
@@ -75,7 +75,7 @@ class DBConnection extends EventEmitter {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
     var arg = {q:"update", table:table, fields:fields, filter:filter };
-    console.log( arg );
+    if( this.trace ) console.log( arg );
     this.connection.send( JSON.stringify(arg) );
   } 
 
@@ -84,7 +84,7 @@ class DBConnection extends EventEmitter {
     this.callback_ctx = callback_ctx;
     this.callback = callback;
     var arg = {q:"insert", table:table, fields:fields };
-    console.log( arg );
+    if( this.trace ) console.log( arg );
     this.connection.send( JSON.stringify(arg) );
   } 
 }
