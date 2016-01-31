@@ -9,7 +9,6 @@ import * as layouts from '../store/db_layouts.js';
 import Snackbar from 'material-ui/lib/snackbar';
 import Divider from 'material-ui/lib/divider';
 import Dialog from 'material-ui/lib/dialog';
-import TextField from 'material-ui/lib/text-field';
 
 import IconButton from 'material-ui/lib/icon-button';
 import ActionSearch from 'material-ui/lib/svg-icons/action/search';
@@ -141,15 +140,15 @@ export default class CompRecambiosProformas extends React.Component {
             console.log( db_all_results );
             callback(null); 
           });
-        })
+        });
       }
     });
 
-    console.log( "Running tasks")
-    console.log( tasks )
+    console.log( "Running tasks");
+    console.log( tasks );
     async.series( tasks, (err)=>{
-      console.log( "All data collected")
-      console.log( db_all_results )
+      console.log( "All data collected");
+      console.log( db_all_results );
       this.validateData({
         db_data: db_all_results, 
         db_orig_data:db_all_results, 
