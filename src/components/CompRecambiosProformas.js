@@ -155,7 +155,7 @@ export default class CompRecambiosProformas extends React.Component {
       layouts.validateDates( layout, ns.db_data );
       if( save_as_orig_data ) {
         // Save the db_orig_data using the parse/stringify to get a real independent copy
-        ns.db_orig_data = JSON.parse( JSON.stringify( ns.db_data ));
+        ns.db_orig_data = _.cloneDeep( ns.db_data );
         ns.db_delta = {};
         ns.db_changed_rec = false;
       } else {
