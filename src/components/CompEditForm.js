@@ -64,10 +64,15 @@ export default class CompEditForm extends React.Component {
         );
 
       } else if( f.type == "array_table" ) {
-        if( !this.props.creating_new )
-          entries.push(
-            <CompFormTable field={f} value={value} key={key}/>
-          );
+        if( this.props.creating_new )
+          continue;
+        entries.push(
+          <CompFormTable field={f} value={value} key={key}/>
+        );
+        entries.push( 
+          <CardActions >
+          <RaisedButton label="New Detail" />
+          </CardActions>);
 
       } else if( f.type == "action" ) {
         entries.push( (

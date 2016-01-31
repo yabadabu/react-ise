@@ -55,10 +55,12 @@ const all_layouts = {
   }
 };
 
+// -------------------------------------------------------------------
 export function get( name ) {
   return all_layouts[name];
 }
 
+// -------------------------------------------------------------------
 export function getFieldByname( layout, field_name ) {
   const idx = _.findIndex( layout.fields, (r)=>{ return r.field === field_name; } );
   if( idx >= 0 )
@@ -66,6 +68,7 @@ export function getFieldByname( layout, field_name ) {
   return undefined;
 }
 
+// -------------------------------------------------------------------
 export function asYYYYMMDD(dt) {
   var r = (1900 + dt.getYear()) + "/";
   var m = 1 + dt.getMonth();
@@ -81,6 +84,7 @@ export function asYYYYMMDD(dt) {
   return r;
 }
 
+// -------------------------------------------------------------------
 export function validateDates( layout, obj ) {
 
   _.each( layout.fields, (f)=>{
@@ -104,6 +108,7 @@ export function validateDates( layout, obj ) {
   });
 }
 
+// -------------------------------------------------------------------
 export function getNewEmptyRegister( layout ) {
   var data = {};
   _.each( layout.fields, (f)=>{

@@ -179,7 +179,7 @@ export default class CompRecambiosProformas extends React.Component {
       (data)=>{
         console.log( "Save completed " + this.state.db_id);
         console.log( data );
-        this.onClickSearchResult( this.state.db_id );
+        this.onClickSearchResult( this.state.db_id, this.state.search_state );
         this.setState({msg_visible:true, msg_text:"Registro grabado correctamente"});
        };
 
