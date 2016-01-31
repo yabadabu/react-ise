@@ -1,13 +1,22 @@
 import React, {PropTypes} from 'react';
+import _ from 'lodash';
 import TextField from 'material-ui/lib/text-field';
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
 import AutoComplete from 'material-ui/lib/auto-complete';
 import ActionSearch from 'material-ui/lib/svg-icons/action/home';
 import RaisedButton from 'material-ui/lib/raised-button';
 
+import Table from 'material-ui/lib/table/table';
+import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
+import TableRow from 'material-ui/lib/table/table-row';
+import TableHeader from 'material-ui/lib/table/table-header';
+import TableRowColumn from 'material-ui/lib/table/table-row-column';
+import TableBody from 'material-ui/lib/table/table-body';
+
 import CardActions from 'material-ui/lib/card/card-actions';
 import FlatButton from 'material-ui/lib/flat-button';
 import Tooltip from 'material-ui/lib/tooltip';
+import * as layouts from '../store/db_layouts.js';
 
 const provincias = [
   [ "Barcelona"
@@ -44,15 +53,58 @@ export default class CompEditForm extends React.Component {
   }
 
   // ---------------------------------------------------------------- 
-  renderButtons() {
-    const buttons_group_style = {float:"right"};
-    if( !this.props.has_changed )
-      return "";
+  renderTable( layout, data ) {
+    var json = JSON.stringify( data, null, '  ' );
+    var headers_row = [];
+    _.forEach( layout.fields, (f)=>{
+      headers_row.push( <TableHeaderColumn>{f.field}</TableHeaderColumn> )
+    });
+    
+    var key = 0;
+    var data_rows = [];
+    _.forEach( data, (v)=>{
+      key++;
+
+      var cells = [];
+      _.forEach( layout.fields, (f)=>{
+        key++;
+
+        var value = v[f.field];
+
+        if( false && f.field === "Cantidad" ) {
+          value = (<TextField 
+            hintText={f.hint}
+            floatingLabelText={f.field}
+            value={value}
+            style={f.style}
+            fullWidth={f.fullWidth}
+            multiLine={f.multiLine}
+            id={f.field}
+            />)
+        } 
+
+        cells.push( <TableRowColumn key={key}>{value}</TableRowColumn>)
+      })
+
+      data_rows.push(<TableRow key={key}>{cells}</TableRow>);
+    });
+    console.log( data_rows );
+
     return (
-      <CardActions expandable style={buttons_group_style}>
-        <RaisedButton label="Save" onClick={this.props.onClick.bind( this, "Save" )} />
-        <RaisedButton label="Cancel" onClick={this.props.onClick.bind( this, "Cancel" )} />
-      </CardActions>);
+      <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {headers_row}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data_rows}
+        </TableBody>
+      </Table>
+      <pre>{json}</pre>
+      </div>
+      )
   }
 
   // ---------------------------------------------------------------- 
@@ -73,7 +125,8 @@ export default class CompEditForm extends React.Component {
 
       if( f.type === "text" ) {
         entries.push( 
-          <span key={key}><TextField 
+          <TextField 
+            className="form_input"
             hintText={f.hint}
             floatingLabelText={f.field}
             value={value}
@@ -81,8 +134,9 @@ export default class CompEditForm extends React.Component {
             fullWidth={f.fullWidth}
             multiLine={f.multiLine}
             id={f.field}
+            key={key}
             onChange={this.handleChange.bind(this,f)}
-            /></span>
+            />
           );
 
       } else if( f.type == "action" ) {
@@ -96,10 +150,10 @@ export default class CompEditForm extends React.Component {
       } else if( f.type == "provincia" ) {
         entries.push( 
           <AutoComplete
+            key={key}
             floatingLabelText={f.field}
             filter={AutoComplete.caseInsensitiveFilter}
             searchText={value}
-            key={key}
             onUpdateInput={this.handleAutoCompleteChange.bind(this,f)}
             onNewRequest={this.handleAutoCompleteChange.bind(this,f)}
             dataSource={["Barcelona", "Sevilla", "Madrid", "Leon"]}
@@ -112,9 +166,10 @@ export default class CompEditForm extends React.Component {
         //console.log( value )
         //console.log( curr_date)
         entries.push( 
-          <div key={key} style={f.style}>
           <DatePicker
             hintText={f.field}
+            className="form_input"
+            key={key} 
             floatingLabelText={f.field}
             autoOk
             textFieldStyle={f.textstyle}
@@ -123,8 +178,14 @@ export default class CompEditForm extends React.Component {
             value={curr_date}
             onChange={this.handleDateChange.bind(this,f)}
             mode="landscape" />
-          </div>
           );
+
+      } else if( f.type == "array_table" ) {
+        var ext_layout = layouts.get( f.layout );
+        console.log( "Array table " + f.layout )
+        console.log( ext_layout )
+        entries.push( this.renderTable( ext_layout, value ) );
+
       }
     }
 
