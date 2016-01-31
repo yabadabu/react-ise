@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react';
 import _ from 'lodash';
+import async from 'async';
 
 import CompSearchDB from './CompSearchDB';
 import dbConn from '../store/db_connection.js';
@@ -86,21 +87,76 @@ export default class CompRecambiosProformas extends React.Component {
     this.setState({connected:dbConn.isConnected()});
   }
 
+  // e is the unique id of the selected row in the comp search results
   onClickSearchResult( e, search_state ) {
-    this.setState({db_id: e});
-    var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, e );
     console.log( "onClickSearchResult" );
-    console.log( this );
-    dbConn.DBSelect( layout.table
-                   , ["*"]
-                   , resolved_filter
-                   , this
-                   , (data) => {
-      //console.log( "DBSelect" );
-      //console.log( data[0] );
-      //console.log( this );
-      this.validateData( {db_data: data[0], db_orig_data:data[0], db_creating_new:false, search_state:search_state} );
-    });      
+    this.setState({db_id: e, db_data:null});
+
+    // Prepare the main query and the subqueries
+    var db_all_results = {};
+    var tasks = [];
+    tasks.push( (callback)=>{
+      // Main query
+      console.log( "Retrieving main data for key " + e );
+      var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, e );
+      dbConn.DBSelect( layout.table
+                     , ["*"]
+                     , resolved_filter
+                     , this
+                     , (data) => { 
+        console.log( "Main query recv");
+        console.log( data );
+        db_all_results = Object.assign({},db_all_results,data[0]); 
+        console.log( db_all_results );
+        callback(null); 
+      });
+    });
+
+    //tasks.push( (callback)=>{ setTimeout( callback, 2000 ); } );
+
+    // For subqueries if needed
+    _.each( layout.fields, (f)=>{
+      if( f.type === "array_table" ) {
+        tasks.push( (callback)=>{
+          console.log( "Retrieving data for field " + f.field );
+          console.log( layout );
+          var ext_layout = layouts.get( f.layout );
+          console.log( "External layout" );
+          console.log( ext_layout );
+          console.log( "Local field to search is " + f.local );
+          var searched_field = layouts.getFieldByname( layout, f.local );
+          console.log( "searched_field " );
+          console.log( searched_field );
+          var searched_value = db_all_results[ searched_field.field ];
+          console.log( "searched_value " + searched_value );
+          var resolved_filter = ext_layout.search.join.filter.replace( /__FIELD__/, searched_value );
+          dbConn.DBSelect( ext_layout.table
+                         , ["*"]
+                         , resolved_filter
+                         , this
+                         , (data) => { 
+            console.log( "Sub query for " + f.field + " recv");
+            console.log( data );
+            db_all_results[ f.field ] = data;
+            console.log( db_all_results );
+            callback(null); 
+          });
+        })
+      }
+    });
+
+    console.log( "Running tasks")
+    console.log( tasks )
+    async.series( tasks, (err)=>{
+      console.log( "All data collected")
+      console.log( db_all_results )
+      this.validateData({
+        db_data: db_all_results, 
+        db_orig_data:db_all_results, 
+        db_creating_new:false, 
+        search_state:search_state
+      });
+    });
   }
 
   validateData( ns ) {

@@ -16,7 +16,6 @@ const all_layouts = {
         min_num_chars: 3      // to fire the trigger
       },
       exact: { 
-        cmd: "Recambios.Proforma.ByID",
         filter: "IDProforma = '__FIELD__'" 
       }
     },
@@ -32,13 +31,39 @@ const all_layouts = {
       { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
       { field:"Provincia", type:"provincia", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
-      { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true }
+      { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true },
+      { field:"details", type:"array_table", layout:"proforma_details", local:"IDProforma", remote:"IDProforma" }
+    ]
+  },
+  proforma_details: {
+    key_field: 'ID',
+    title: "Details",
+    table: "[Recambios - Proformas - Detalles]",
+    search: {
+      join: { 
+        filter: "IDProforma = '__FIELD__'" 
+      }
+    },
+    fields: [
+      { field:"REF", type:"text" },
+      { field:"Cantidad", type:"number" },
+      { field:"EurosUnidad", type:"money" },
+      { field:"Total", type:"money" },
+      { field:"Tipo", type:"number" },
+      { field:"Nota", type:"text" }
     ]
   }
 };
 
 export function get( name ) {
   return all_layouts[name];
+}
+
+export function getFieldByname( layout, field_name ) {
+  const idx = _.findIndex( layout.fields, (r)=>{ return r.field === field_name; } );
+  if( idx >= 0 )
+    return layout.fields[idx];
+  return undefined;
 }
 
 export function getNewEmptyRegister( layout ) {
