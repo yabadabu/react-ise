@@ -192,6 +192,7 @@ export default class CompRecambiosProformas extends React.Component {
                      , this
                      , handler );
     } else {
+      // Not allowing changes in the key field
       delete changes[ layout.key_field ];
       dbConn.DBUpdate( layout.table
                      , changes

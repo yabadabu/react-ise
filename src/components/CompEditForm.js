@@ -50,7 +50,7 @@ export default class CompEditForm extends React.Component {
 
       if( f.type === "text" ) {
         entries.push( 
-          <CompFormText field={f} value={value} key={key} onChange={this.handleTextChange.bind(this,f)}/>
+          <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleTextChange.bind(this,f)}/>
         );
 
       } else if( f.type == "provincia" ) {

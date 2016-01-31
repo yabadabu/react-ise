@@ -101,7 +101,7 @@ export function validateDates( layout, obj ) {
         obj[ f.field ] = new_value;
       }
     }
-  })
+  });
 }
 
 export function getNewEmptyRegister( layout ) {

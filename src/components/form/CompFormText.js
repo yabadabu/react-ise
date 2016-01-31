@@ -4,7 +4,8 @@ import TextField from 'material-ui/lib/text-field';
 
 const CompFormText = (props) => {
   const f  = props.field;
-  let label = props.inside_table ? "" : f.field;
+  const label = props.inside_table ? "" : f.field;
+  const disabled = f.read_only && !props.creating_new;
   return (
     <TextField 
       className="form_input"
@@ -16,6 +17,7 @@ const CompFormText = (props) => {
       multiLine={f.multiLine}
       id={f.field}
       key={props.key}
+      disabled={disabled}
       onChange={props.onChange}
       />
   );
@@ -26,6 +28,7 @@ CompFormText.propTypes = {
   value: PropTypes.string,
   key: PropTypes.number.isRequired,
   inside_table: PropTypes.bool,
+  creating_new: PropTypes.bool,
   onChange: PropTypes.func.isRequired
 };
 
