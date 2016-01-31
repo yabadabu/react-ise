@@ -45,6 +45,7 @@ const all_layouts = {
       }
     },
     fields: [
+      { field:"ID", type:"number", read_only:true },
       { field:"REF", type:"text" },
       { field:"Cantidad", type:"number" },
       { field:"EurosUnidad", type:"money" },

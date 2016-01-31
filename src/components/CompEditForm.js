@@ -31,6 +31,22 @@ export default class CompEditForm extends React.Component {
   handleDateChange( field, this_is_null, new_date ) {
     this.handleHandle( field, layouts.asYYYYMMDD( new_date )); 
   }
+  handleTableChange( main_field, external_field, external_id, external_idx, new_value ) {
+    /*
+    console.log( "at handleTableChange" );
+    console.log( this );
+    console.log( main_field );
+    console.log( external_field );
+    console.log( external_id );
+    console.log( external_idx );
+    console.log( new_value );
+    console.log( this.props.data );
+    */
+    var new_data = this.props.data[main_field.field];
+    new_data[ external_idx ][ external_field.field ] = new_value;
+    //console.log( new_data );
+    this.handleHandle( main_field, new_data); 
+  }
 
   // ---------------------------------------------------------------- 
   render() {
@@ -67,7 +83,7 @@ export default class CompEditForm extends React.Component {
         if( this.props.creating_new )
           continue;
         entries.push(
-          <CompFormTable field={f} value={value} key={key}/>
+          <CompFormTable field={f} value={value} key={key} onChange={this.handleTableChange.bind(this,f)}/>
         );
         entries.push( 
           <CardActions >
