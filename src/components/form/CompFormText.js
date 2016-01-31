@@ -6,17 +6,26 @@ const CompFormText = (props) => {
   const f  = props.field;
   const label = props.inside_table ? "" : f.field;
   const disabled = f.read_only && !props.creating_new;
+  let style = f.style;
+  let inputStyle = f.inputStyle;
+  if( !inputStyle ) inputStyle = {};
+  if( !style ) style = {};
+  if( f.type === "number" || f.type === "money") {
+    inputStyle["textAlign"] = "right";
+    style["width"] = null;
+  }
   return (
     <TextField 
+      key={props.key}
       className="form_input"
       hintText={f.hint}
       floatingLabelText={label}
       value={props.value}
-      style={f.style}
+      style={style}
+      inputStyle={inputStyle}
       fullWidth={f.fullWidth}
       multiLine={f.multiLine}
       id={f.field}
-      key={props.key}
       disabled={disabled}
       onChange={props.onChange}
       />

@@ -19,7 +19,10 @@ const CompFormTable = (props) => {
 
   var headers_row = [];
   _.forEach( layout.fields, (f)=>{
-    headers_row.push( <TableHeaderColumn>{f.field}</TableHeaderColumn> );
+    var style = {};
+    if( f.type == "number" || f.type == "money") 
+      style.textAlign = ["right"]
+    headers_row.push( <TableHeaderColumn style={style}>{f.field}</TableHeaderColumn> );
   });
 
   // For each row
@@ -35,7 +38,7 @@ const CompFormTable = (props) => {
 
       var value = v[f.field];
 
-      if( f.field === "Cantidad" ) 
+      if( f.type === "text" || f.type == "number" || f.type == "money") 
         value = (<CompFormText field={f} value={value} inside_table/>);
 
       cells.push( <TableRowColumn key={key}>{value}</TableRowColumn>);
@@ -45,6 +48,7 @@ const CompFormTable = (props) => {
   });
 
   return (
+
     <Table key={props.key}>
       <TableHeader>
         <TableRow>
