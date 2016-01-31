@@ -43,6 +43,7 @@ export default class CompEditForm extends React.Component {
     console.log( this.props.data );
     */
     var new_data = this.props.data[main_field.field];
+    //new_data[ external_idx ] = _.clone( this.props.data[main_field.field][ external_idx ] );
     new_data[ external_idx ][ external_field.field ] = new_value;
     //console.log( new_data );
     this.handleHandle( main_field, new_data); 

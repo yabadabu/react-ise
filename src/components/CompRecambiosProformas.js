@@ -27,12 +27,22 @@ import CardActions from 'material-ui/lib/card/card-actions';
 const layout = layouts.get( "proforma" );
 
 function getPropertiesOfAChangedFromB( a, b ) {
-  if( !a || !b )
+  if( !a || !b)
     return {};
   var diffs = {};
   for( var k in a ) {
-    if( ( typeof b[k] == undefined ) || b[k] !== a[k] ) 
-      diffs[k] = b[k];
+    if( ( typeof b[k] == undefined ) || b[k] !== a[k] ) {
+      if( Array.isArray( b[k] ) ) {
+        var array_diff = [];
+        for( var q in b[k]) 
+          array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
+        diffs[k] = array_diff;
+
+      } else {
+        diffs[k] = b[k];
+
+      }
+    }
   }
   return diffs;
 }
@@ -88,9 +98,10 @@ export default class CompRecambiosProformas extends React.Component {
                      , this
                      , (data) => { 
         console.log( "Main query recv");
-        console.log( data );
-        db_all_results = Object.assign({},db_all_results,data[0]); 
-        console.log( db_all_results );
+        //console.log( data );
+        //db_all_results = Object.assign({},db_all_results,data[0]); 
+        db_all_results = data[0]; 
+        //console.log( db_all_results );
         callback(null); 
       });
     });
@@ -101,55 +112,59 @@ export default class CompRecambiosProformas extends React.Component {
     _.each( layout.fields, (f)=>{
       if( f.type === "array_table" ) {
         tasks.push( (callback)=>{
-          console.log( "Retrieving data for field " + f.field );
-          console.log( layout );
+          //console.log( "Retrieving data for field " + f.field );
+          //console.log( layout );
           var ext_layout = layouts.get( f.layout );
-          console.log( "External layout" );
-          console.log( ext_layout );
-          console.log( "Local field to search is " + f.local );
+          //console.log( "External layout" );
+          //console.log( ext_layout );
+          //console.log( "Local field to search is " + f.local );
           var searched_field = layouts.getFieldByname( layout, f.local );
-          console.log( "searched_field " );
-          console.log( searched_field );
+          //console.log( "searched_field " );
+          //console.log( searched_field );
           var searched_value = db_all_results[ searched_field.field ];
-          console.log( "searched_value " + searched_value );
+          //console.log( "searched_value " + searched_value );
           var resolved_filter = ext_layout.search.join.filter.replace( /__FIELD__/, searched_value );
           dbConn.DBSelect( ext_layout.table
                          , ["*"]
                          , resolved_filter
                          , this
                          , (data) => { 
-            console.log( "Sub query for " + f.field + " recv");
-            console.log( data );
+            //console.log( "Sub query for " + f.field + " recv");
+            //console.log( data );
             db_all_results[ f.field ] = data;
-            console.log( db_all_results );
+            //console.log( db_all_results );
             callback(null); 
           });
         });
       }
     });
 
-    console.log( "Running tasks");
-    console.log( tasks );
     async.series( tasks, (err)=>{
       console.log( "All data collected");
-      console.log( db_all_results );
       this.validateData({
         db_data: db_all_results, 
-        db_orig_data:db_all_results, 
         db_creating_new:false, 
         search_state:search_state
-      });
+      }, true);
     });
   }
 
-  validateData( ns ) {
+  // --------------------------------------------------------
+  validateData( ns, save_as_orig_data ) {
     if( ns.db_data ) {
       layouts.validateDates( layout, ns.db_data );
-      var ref = this.state.db_orig_data;
-      if( ns.db_orig_data )
-        ref = ns.db_orig_data;
-      ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
-      ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
+      if( save_as_orig_data ) {
+        // Save the db_orig_data using the parse/stringify to get a real independent copy
+        ns.db_orig_data = JSON.parse( JSON.stringify( ns.db_data ));
+        ns.db_delta = {};
+        ns.db_changed_rec = false;
+      } else {
+        var ref = this.state.db_orig_data;
+        if( ns.db_orig_data )
+          ref = ns.db_orig_data;
+        ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
+        ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
+      }
     }
     //console.log( "ns is now")
     //console.log( ns );
@@ -157,7 +172,6 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   onDataChange( new_db_data ) {
-    //console.log( "onDataChange" );
     this.validateData({db_data:new_db_data});
   }
 
@@ -206,13 +220,11 @@ export default class CompRecambiosProformas extends React.Component {
   onClickNew( ) {
     console.log( "New register...");
     const new_db_data = layouts.getNewEmptyRegister( layout );
-    const new_db_orig_data = new_db_data;
     this.validateData( 
       { db_data: new_db_data
-      , db_orig_data:new_db_orig_data
       , db_id:"new"
       , db_creating_new:true
-      });
+      }, true);
   }
 
   // --------------------------------------------------------------
@@ -322,6 +334,10 @@ export default class CompRecambiosProformas extends React.Component {
   // ------------------------------------------------------------------
   render() {
 
+    //console.log( "CompRecambiosProforma::render")
+    //console.log( this.state.db_data )
+    //console.log( this.state.db_orig_data )
+
     if( !this.state.connected ) 
       return this.renderDisconnected();
 
@@ -337,7 +353,7 @@ export default class CompRecambiosProformas extends React.Component {
     var save = this.renderSaveButton();
     var msg = this.renderSnackBar();
     var form = this.renderForm();
-    var json = JSON.stringify( this.state, null, '  ' );
+    var json = ""; //JSON.stringify( this.state, null, '  ' );
     //console.log( this.state );
     return (<div>{save}{form}<Divider />{msg}{dlg}<pre>{json}</pre></div>);
   }
