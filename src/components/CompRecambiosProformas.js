@@ -11,6 +11,7 @@ import Divider from 'material-ui/lib/divider';
 import Dialog from 'material-ui/lib/dialog';
 
 import IconButton from 'material-ui/lib/icon-button';
+import ActionBuild from 'material-ui/lib/svg-icons/action/build';
 import ActionSearch from 'material-ui/lib/svg-icons/action/search';
 import ActionCopy from 'material-ui/lib/svg-icons/content/content-copy';
 import ActionPaste from 'material-ui/lib/svg-icons/content/content-paste';
@@ -64,6 +65,7 @@ export default class CompRecambiosProformas extends React.Component {
     , msg_text: "blah blah"
     , modal_dlg_open: false
     , search_state: null
+    , trace: false
     };
   }
 
@@ -247,6 +249,10 @@ export default class CompRecambiosProformas extends React.Component {
     this.setState( {db_id:null} );
   }
 
+  onClickDevOptions() {
+    this.setState( {trace:!this.state.trace });
+  }
+
   // --------------------------------------------------------------
   onClick( e, dummy ) {
     console.log( "On click..." + e );
@@ -284,6 +290,7 @@ export default class CompRecambiosProformas extends React.Component {
     var is_new = this.state.db_creating_new;
     return (
       <CardActions expandable style={buttons_group_style}>
+        <IconButton tooltip="Dev" onClick={this.onClickDevOptions.bind(this)}><ActionBuild/></IconButton>
         <IconButton tooltip="Buscar de nuevo" onClick={this.onClickSearchAgain.bind(this)}><ActionSearch/></IconButton>
         <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
         <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
@@ -353,7 +360,7 @@ export default class CompRecambiosProformas extends React.Component {
     var save = this.renderSaveButton();
     var msg = this.renderSnackBar();
     var form = this.renderForm();
-    var json = ""; //JSON.stringify( this.state, null, '  ' );
+    var json = this.state.trace ? JSON.stringify( this.state, null, '  ' ) : "";
     //console.log( this.state );
     return (<div>{save}{form}<Divider />{msg}{dlg}<pre>{json}</pre></div>);
   }
