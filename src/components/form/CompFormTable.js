@@ -57,7 +57,7 @@ const CompFormTable = (props) => {
 
   return (
 
-    <Table key={props.key}>
+    <Table key={props.key} selectable={false}>
       <CompFormTableLayoutHeaders layout={layout}/>)
       <TableBody>
         {data_rows}
