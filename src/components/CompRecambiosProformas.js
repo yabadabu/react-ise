@@ -209,14 +209,55 @@ export default class CompRecambiosProformas extends React.Component {
                      , handler );
     } else {
       // Not allowing changes in the key field
-      delete changes[ layout.key_field ];
-      dbConn.DBUpdate( layout.table
-                     , changes
-                     , layout.key_field + "='"+ this.state.db_id + "'"
-                     , this
-                     , handler );
-    }
+      var main_required = false;
+      var tasks = [];
+      var main_changes = {}
+      _.each( changes, (v,k)=>{
+        if( Array.isArray(v)) {
+          // Updating details!
+          console.log( "Updating subtable " + k)
+          var searched_field = layouts.getFieldByname( layout, k ); // All field
+          var ext_layout     = layouts.get( searched_field.layout );    // Layout
+          var ext_key_field  = ext_layout.key_field;
+          // For each detail...
+          _.each( v, (sub_changes,idx) =>{
+            if( Object.keys( sub_changes ).length ) {
+              console.log( sub_changes );
+              var ext_id = this.state.db_data[k][idx][ext_key_field];
+              console.log( ext_layout.key_field + "="+ ext_id );
+              tasks.push( (callback)=>{
+                dbConn.DBUpdate( ext_layout.table
+                               , sub_changes
+                               , ext_layout.key_field + "="+ ext_id
+                               , this
+                               , (data)=>{
+                                callback(null);
+                });
+              });
+            }
+          })
+        } else {
+          main_changes[ k ] = v;
+          main_required = true;
+        }
+      })
 
+      if( main_required ) {
+        delete changes[ layout.key_field ];
+        tasks.push( (cb)=>{ 
+          console.log( "Updating main table")
+          console.log( main_changes );
+          dbConn.DBUpdate( layout.table
+                         , main_changes
+                         , layout.key_field + "='"+ this.state.db_id + "'"
+                         , this
+                         , handler );
+        })
+      }
+      async.series( tasks, (callback)=> {
+        console.log( "All updated!");
+      });
+    }
   }
   // --------------------------------------------------------------
   onClickNew( ) {
