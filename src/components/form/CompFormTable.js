@@ -4,31 +4,18 @@ import _ from 'lodash';
 import * as layouts from '../../store/db_layouts.js';
 
 import Table from 'material-ui/lib/table/table';
-import TableHeaderColumn from 'material-ui/lib/table/table-header-column';
 import TableRow from 'material-ui/lib/table/table-row';
-import TableHeader from 'material-ui/lib/table/table-header';
 import TableRowColumn from 'material-ui/lib/table/table-row-column';
 import TableBody from 'material-ui/lib/table/table-body';
 
-import CompFormText from './CompFormText.js';
+import CompFormText from './CompFormText';
+import CompFormTableLayoutHeaders from './CompFormTableLayoutHeaders';
 
 const CompFormTable = (props) => {
   const f      = props.field;
   const layout = layouts.get( f.layout );
   const values = props.value;
   var key = 0;
-
-  var headers_row = [];
-  _.forEach( layout.fields, (f)=>{
-    key++;
-    var style = {};
-    var title = f.field;
-    if( f.type == "number" || f.type == "money") 
-      style.textAlign = ["right"];
-    if( f.type == "money")
-      title = title + " €";
-    headers_row.push( <TableHeaderColumn key={key} style={style}>{title}</TableHeaderColumn> );
-  });
 
   // ---------------------------------------------------------------------
   // Collect information about which row/field has changed, and sent it back
@@ -71,11 +58,7 @@ const CompFormTable = (props) => {
   return (
 
     <Table key={props.key}>
-      <TableHeader>
-        <TableRow>
-          {headers_row}
-        </TableRow>
-      </TableHeader>
+      <CompFormTableLayoutHeaders layout={layout}/>)
       <TableBody>
         {data_rows}
       </TableBody>
