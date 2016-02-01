@@ -13,25 +13,31 @@ export default class CompFormTableLayoutHeaders extends React.Component {
   }
 
   render() {
+
+    //console.log( "Layout heade rrender");
+    //console.log( this.props.layout );
     var key = 1;
     var headers_row = [];
     _.forEach( this.props.layout.fields, (f)=>{
+      //console.log( f );
       var style = {};
       var title = f.field;
       if( f.type == "number" || f.type == "money") 
         style.textAlign = ["right"];
       if( f.type == "money")
         title = title + " €";
-      headers_row.push( <TableHeaderColumn key={key} style={style}>{title}</TableHeaderColumn> );
+      headers_row.push( <th key={key} style={style}>{title}</th> );
+      //headers_row.push( <div>{title}</div> );
       key++;
     });
 
+    //console.log( headers_row );
     return (
-      <TableHeader>
-        <TableRow>
-          {headers_row}
-        </TableRow>
-      </TableHeader>
+      <thead>
+      <tr>
+      {headers_row}
+      </tr>
+      </thead>
     );
   }
 }

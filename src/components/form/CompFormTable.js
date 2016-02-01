@@ -46,25 +46,25 @@ const CompFormTable = (props) => {
         value = (<CompFormText key={key} field={f} value={value} inside_table onChange={handleChanges.bind(this, f, unique_id, row_idx)}/>);
       key++;
 
-      cells.push( <TableRowColumn key={key}>{value}</TableRowColumn>);
+      cells.push( <td key={key}>{value}</td>);
       key++;
     });
 
-    data_rows.push(<TableRow key={key}>{cells}</TableRow>);
+    data_rows.push(<tr key={key}>{cells}</tr>);
     row_idx++;
     key++;
   });
 
   return (
-
-    <Table key={props.key} selectable={false}>
-      <CompFormTableLayoutHeaders layout={layout}/>)
-      <TableBody>
-        {data_rows}
-      </TableBody>
-    </Table>
-    );
+    <table>
+      <CompFormTableLayoutHeaders layout={layout}/>
+    <tbody>
+      {data_rows}
+    </tbody>
+    </table> 
+   );
 };
+
 
 CompFormTable.propTypes = {
   field: PropTypes.object.isRequired,
