@@ -1,7 +1,7 @@
 - Fix table 
-  - Missing headers
-  - Warnings
-  - Use one component for each row
+  + Missing headers
+  + Warnings
+  + Use one component for each row
   - Option to add new record
 - Lookup de REF/Name, CodigoProvincia/NameProvincia easy for us
 - Get quoted/non quoted unique id filter queries automatically

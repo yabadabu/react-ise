@@ -211,11 +211,11 @@ export default class CompRecambiosProformas extends React.Component {
       // Not allowing changes in the key field
       var main_required = false;
       var tasks = [];
-      var main_changes = {}
+      var main_changes = {};
       _.each( changes, (v,k)=>{
         if( Array.isArray(v)) {
           // Updating details!
-          console.log( "Updating subtable " + k)
+          //console.log( "Updating subtable " + k);
           var searched_field = layouts.getFieldByname( layout, k ); // All field
           var ext_layout     = layouts.get( searched_field.layout );    // Layout
           var ext_key_field  = ext_layout.key_field;
@@ -235,24 +235,24 @@ export default class CompRecambiosProformas extends React.Component {
                 });
               });
             }
-          })
+          });
         } else {
           main_changes[ k ] = v;
           main_required = true;
         }
-      })
+      });
 
       if( main_required ) {
         delete changes[ layout.key_field ];
         tasks.push( (cb)=>{ 
-          console.log( "Updating main table")
+          console.log( "Updating main table");
           console.log( main_changes );
           dbConn.DBUpdate( layout.table
                          , main_changes
                          , layout.key_field + "='"+ this.state.db_id + "'"
                          , this
                          , handler );
-        })
+        });
       }
       async.series( tasks, (callback)=> {
         console.log( "All updated!");

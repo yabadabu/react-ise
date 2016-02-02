@@ -3,19 +3,13 @@ import _ from 'lodash';
 
 import * as layouts from '../../store/db_layouts.js';
 
-import Table from 'material-ui/lib/table/table';
-import TableRow from 'material-ui/lib/table/table-row';
-import TableRowColumn from 'material-ui/lib/table/table-row-column';
-import TableBody from 'material-ui/lib/table/table-body';
-
-import CompFormText from './CompFormText';
+import CompFormTableRow from './CompFormTableRow';
 import CompFormTableLayoutHeaders from './CompFormTableLayoutHeaders';
 
 const CompFormTable = (props) => {
   const f      = props.field;
   const layout = layouts.get( f.layout );
   const values = props.value;
-  var key = 0;
 
   // ---------------------------------------------------------------------
   // Collect information about which row/field has changed, and sent it back
@@ -32,27 +26,17 @@ const CompFormTable = (props) => {
   // For each row
   var row_idx = 0;
   var data_rows = [];
-  _.forEach( values, (v)=>{
-
+  _.forEach( values, (row_values)=>{
     // For each field
-    var unique_id = v[ layout.key_field ];
-    //console.log( "Unique id is " + unique_id );
-    var cells = [];
-    _.forEach( layout.fields, (f)=>{
-
-      var value = v[f.field];
-
-      if( f.type === "text" || f.type == "number" || f.type == "money") 
-        value = (<CompFormText key={key} field={f} value={value} inside_table onChange={handleChanges.bind(this, f, unique_id, row_idx)}/>);
-      key++;
-
-      cells.push( <td key={key}>{value}</td>);
-      key++;
-    });
-
-    data_rows.push(<tr key={key}>{cells}</tr>);
+    var row = (<CompFormTableRow 
+                  layout={layout} 
+                  values={row_values} 
+                  onChange={handleChanges}
+                  row_idx={row_idx}
+                  key={row_idx}
+                  />);
+    data_rows.push(row);
     row_idx++;
-    key++;
   });
 
   return (
