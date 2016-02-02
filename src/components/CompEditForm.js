@@ -48,6 +48,18 @@ export default class CompEditForm extends React.Component {
     //console.log( new_data );
     this.handleHandle( main_field, new_data); 
   }
+  handleAddNewDetailOnTable( f ) {
+    console.log( "Adding new item" );
+    console.log( f );
+    // Get access to the details layout
+    const ext_layout = layouts.get( f.layout );
+    var new_rec = layouts.getNewEmptyRegister( ext_layout );
+    // Get access to the full 'details'
+    var all_details = this.props.data[f.field];
+    new_rec._is_new = true;
+    all_details.push( new_rec );
+    this.handleHandle( f, all_details); 
+  }
 
   // ---------------------------------------------------------------- 
   render() {
@@ -86,11 +98,13 @@ export default class CompEditForm extends React.Component {
         entries.push(
           <CompFormTable field={f} value={value} key={key} onChange={this.handleTableChange.bind(this,f)}/>
         );
-        key++;
-        entries.push( 
-          <CardActions key={key} >
-          <RaisedButton label="New Detail" />
-          </CardActions>);
+        if( value.length > 0 && value[ value.length-1 ] && !value[ value.length-1 ]._is_new ) {
+          key++;
+          entries.push( 
+            <CardActions key={key} >
+            <RaisedButton label="New Detail" onClick={this.handleAddNewDetailOnTable.bind(this,f)} />
+            </CardActions>);
+        }
 
       } else if( f.type == "action" ) {
         entries.push( (

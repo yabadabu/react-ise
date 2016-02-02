@@ -35,6 +35,7 @@ function getPropertiesOfAChangedFromB( a, b ) {
     if( ( typeof b[k] == undefined ) || b[k] !== a[k] ) {
       if( Array.isArray( b[k] ) ) {
         var array_diff = [];
+        //console.log( "Comparing", a[k], b[k] );
         for( var q in b[k]) 
           array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
         diffs[k] = array_diff;
@@ -221,6 +222,8 @@ export default class CompRecambiosProformas extends React.Component {
           var ext_key_field  = ext_layout.key_field;
           // For each detail...
           _.each( v, (sub_changes,idx) =>{
+            // Si el registro no tiene campos es que no ha habido diferencias
+            // en el registro i-esimo
             if( Object.keys( sub_changes ).length ) {
               console.log( sub_changes );
               var ext_id = this.state.db_data[k][idx][ext_key_field];
