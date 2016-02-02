@@ -28,22 +28,33 @@ import CardActions from 'material-ui/lib/card/card-actions';
 const layout = layouts.get( "proforma" );
 
 function getPropertiesOfAChangedFromB( a, b ) {
-  if( !a || !b)
+  //console.log( "getPropertiesOfAChangedFromB", a, b );
+  if( !a )
     return {};
+  if( !b )
+    return a;
   var diffs = {};
   for( var k in a ) {
-    if( ( typeof b[k] == undefined ) || b[k] !== a[k] ) {
-      if( Array.isArray( b[k] ) ) {
-        var array_diff = [];
-        //console.log( "Comparing", a[k], b[k] );
-        for( var q in b[k]) 
-          array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
-        diffs[k] = array_diff;
-
-      } else {
-        diffs[k] = b[k];
-
-      }
+    /*
+    console.log( "k=" + k 
+               , "a.k " + (typeof a[k] ) + " "
+               , a[k]
+               , " vs "
+               , "b.k " + (typeof b[k] ) + " " 
+               , b[k]
+               );
+    */
+    if( Array.isArray( a[k] ) ) {
+      var array_diff = [];
+      //console.log( "Comparing", a[k], b[k] );
+      for( var q in a[k]) 
+        array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
+      diffs[k] = array_diff;
+    } 
+    else {
+      if( ( typeof a[k] == undefined ) || b[k].toString() !== a[k].toString() ) {
+        diffs[k] = a[k];
+      } 
     }
   }
   return diffs;
@@ -157,7 +168,7 @@ export default class CompRecambiosProformas extends React.Component {
     if( ns.db_data ) {
       layouts.validateDates( layout, ns.db_data );
       if( save_as_orig_data ) {
-        // Save the db_orig_data using the parse/stringify to get a real independent copy
+        // Get an independent copy of the db_data
         ns.db_orig_data = _.cloneDeep( ns.db_data );
         ns.db_delta = {};
         ns.db_changed_rec = false;
@@ -165,7 +176,7 @@ export default class CompRecambiosProformas extends React.Component {
         var ref = this.state.db_orig_data;
         if( ns.db_orig_data )
           ref = ns.db_orig_data;
-        ns.db_delta = getPropertiesOfAChangedFromB( ref, ns.db_data );
+        ns.db_delta = getPropertiesOfAChangedFromB( ns.db_data, ref );
         ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
       }
     }
@@ -217,26 +228,46 @@ export default class CompRecambiosProformas extends React.Component {
         if( Array.isArray(v)) {
           // Updating details!
           //console.log( "Updating subtable " + k);
-          var searched_field = layouts.getFieldByname( layout, k ); // All field
-          var ext_layout     = layouts.get( searched_field.layout );    // Layout
+          var searched_field = layouts.getFieldByname( layout, k );   // All fields of 'details'
+          var ext_layout     = layouts.get( searched_field.layout );  // Layout
           var ext_key_field  = ext_layout.key_field;
           // For each detail...
           _.each( v, (sub_changes,idx) =>{
             // Si el registro no tiene campos es que no ha habido diferencias
             // en el registro i-esimo
-            if( Object.keys( sub_changes ).length ) {
-              console.log( sub_changes );
-              var ext_id = this.state.db_data[k][idx][ext_key_field];
-              console.log( ext_layout.key_field + "="+ ext_id );
+            if( sub_changes._is_new ) {
+              
+              delete sub_changes._is_new;           // Remove _is_new because it's not a field
+              delete sub_changes[ext_key_field];    // Remove .ID as it's autoincremented
+              // Add the link field. remote.IDProforma = main_table.IDProforma
+              sub_changes[ searched_field.remote ] = this.state.db_data[ searched_field.local ];
+
               tasks.push( (callback)=>{
-                dbConn.DBUpdate( ext_layout.table
+                dbConn.DBInsert( ext_layout.table
                                , sub_changes
-                               , ext_layout.key_field + "="+ ext_id
                                , this
                                , (data)=>{
+                                console.log( "Inserted in subtable")
                                 callback(null);
                 });
               });
+
+            } else {
+
+              if( Object.keys( sub_changes ).length ) {
+                console.log( sub_changes );
+                var ext_id = this.state.db_data[k][idx][ext_key_field];
+                console.log( ext_layout.key_field + "="+ ext_id );
+                tasks.push( (callback)=>{
+                  dbConn.DBUpdate( ext_layout.table
+                                 , sub_changes
+                                 , ext_layout.key_field + "="+ ext_id
+                                 , this
+                                 , (data)=>{
+                                  callback(null);
+                  });
+                });
+              }
             }
           });
         } else {
@@ -259,6 +290,7 @@ export default class CompRecambiosProformas extends React.Component {
       }
       async.series( tasks, (callback)=> {
         console.log( "All updated!");
+        handler();
       });
     }
   }
@@ -405,6 +437,12 @@ export default class CompRecambiosProformas extends React.Component {
     var msg = this.renderSnackBar();
     var form = this.renderForm();
     var json = this.state.trace ? JSON.stringify( this.state, null, '  ' ) : "";
+
+    if( this.state.trace ) {
+     json = "delta: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
+     json += "db.details: " + JSON.stringify( this.state.db_data.details, null, '  ' ) + "\n";
+     json += "orig.details: " + JSON.stringify( this.state.db_orig_data.details, null, '  ' );
+    }
     //console.log( this.state );
     return (<div>{save}{form}<Divider />{msg}{dlg}<pre>{json}</pre></div>);
   }
