@@ -8,6 +8,7 @@ import CompFormText from './form/CompFormText.js';
 import CompFormDate from './form/CompFormDate.js';
 import CompFormAutoComplete from './form/CompFormAutoComplete.js';
 import CompFormTable from './form/CompFormTable.js';
+import CompFormSelect from './form/CompFormSelect.js';
 
 import CardActions from 'material-ui/lib/card/card-actions';
 import FlatButton from 'material-ui/lib/flat-button';
@@ -27,6 +28,10 @@ export default class CompEditForm extends React.Component {
   }
   handleAutoCompleteChange( field, new_value ) { 
     this.handleHandle( field, new_value); 
+  }
+  handleSelectChange( field, event, index, new_value ) { 
+    this.handleHandle( field, new_value); 
+    //console.log( field, event, index, new_value )
   }
   handleDateChange( field, this_is_null, new_date ) {
     this.handleHandle( field, layouts.asYYYYMMDD( new_date )); 
@@ -82,17 +87,22 @@ export default class CompEditForm extends React.Component {
           <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleTextChange.bind(this,f)}/>
         );
 
-      } else if( f.type == "provincia" ) {
+      } else if( f.type === "provincia" ) {
         entries.push( 
           <CompFormAutoComplete field={f} value={value} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
         );
 
-      } else if( f.type == "date" ) {
+      } else if( f.type === "date" ) {
         entries.push(
           <CompFormDate field={f} value={value} key={key} onChange={this.handleDateChange.bind(this,f)}/>
         );
 
-      } else if( f.type == "array_table" ) {
+      } else if( f.type === "select" ) {
+        entries.push(
+          <CompFormSelect field={f} value={value.toString()} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
+        );
+
+      } else if( f.type === "array_table" ) {
         if( this.props.creating_new )
           continue;
         entries.push(
@@ -106,7 +116,7 @@ export default class CompEditForm extends React.Component {
             </CardActions>);
         }
 
-      } else if( f.type == "action" ) {
+      } else if( f.type === "action" ) {
         entries.push( (
         <ActionSearch 
             key={key}

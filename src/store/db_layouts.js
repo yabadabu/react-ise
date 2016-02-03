@@ -29,7 +29,7 @@ const all_layouts = {
       { field:"Calle", type:"text", style:{ width:"30%" } },
       { field:"Poblacion", type:"text", style:{ width:"30%" } },
       { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
-      { field:"Provincia", type:"provincia", hint:"Provincia", style:{ width:"15%" } },
+      { field:"IDProvincia", type:"select", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
       { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true },
       { field:"details", type:"array_table", layout:"proforma_details", local:"IDProforma", remote:"IDProforma" }

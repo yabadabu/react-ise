@@ -247,7 +247,6 @@ export default class CompRecambiosProformas extends React.Component {
                                , sub_changes
                                , this
                                , (data)=>{
-                                console.log( "Inserted in subtable")
                                 callback(null);
                 });
               });
