@@ -87,9 +87,9 @@ export default class CompEditForm extends React.Component {
           <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleTextChange.bind(this,f)}/>
         );
 
-      } else if( f.type === "provincia" ) {
+      } else if( f.type === "lut" ) {
         entries.push( 
-          <CompFormAutoComplete field={f} value={value} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
+          <CompFormAutoComplete field={f} value={value.toString()} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
         );
 
       } else if( f.type === "date" ) {

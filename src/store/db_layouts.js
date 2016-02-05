@@ -29,7 +29,7 @@ const all_layouts = {
       { field:"Calle", type:"text", style:{ width:"30%" } },
       { field:"Poblacion", type:"text", style:{ width:"30%" } },
       { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
-      { field:"IDProvincia", type:"select", hint:"Provincia", style:{ width:"15%" } },
+      { field:"IDProvincia", type:"lut", lut:"Provincias.ID", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
       { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true },
       { field:"details", type:"array_table", layout:"proforma_details", local:"IDProforma", remote:"IDProforma" }
@@ -45,13 +45,18 @@ const all_layouts = {
       }
     },
     fields: [
-      { field:"ID", type:"number", read_only:true },
-      { field:"REF", type:"text" },
+      { field:"ID", type:"hidden", read_only:true },
+      { field:"REF", type:"lut_id", lut:"Recambios.REF", hint:"Referencia", column_style:{width:"60px"} },
+      { field:"REF.Name", type:"lut_text", title:"Nombre"
+                        , lut:"Recambios.REF", link:"REF", hint:"Referencia"
+                        , column_style:{width:"300px"}
+                        },
       { field:"Cantidad", type:"number" },
-      { field:"EurosUnidad", type:"money" },
+      { field:"EurosUnidad", type:"money", title:"€/Unidad" },
       { field:"Total", type:"money" },
       { field:"Tipo", type:"number" },
-      { field:"Nota", type:"text" }
+      { field:"Delete", type:"action", title:" " }
+     // { field:"Nota", type:"text" }
     ]
   }
 };
@@ -118,8 +123,8 @@ export function getNewEmptyRegister( layout ) {
         data[f.field] = asYYYYMMDD( new Date() );
       else if( f.type == "array_table") 
         data[f.field] = [];
-      else if( f.type == "provincia")
-        data[f.field] = "";
+      else if( f.type == "lut_text" || f.type =="action")
+        return;
       else 
         data[f.field] = null;
     } 

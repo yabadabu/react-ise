@@ -51,7 +51,7 @@ function getPropertiesOfAChangedFromB( a, b ) {
         array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
       diffs[k] = array_diff;
     } 
-    else {
+    else if( b[k] ) {
       if( ( typeof a[k] == undefined ) || b[k].toString() !== a[k].toString() ) {
         diffs[k] = a[k];
       } 
@@ -109,7 +109,6 @@ export default class CompRecambiosProformas extends React.Component {
       dbConn.DBSelect( layout.table
                      , ["*"]
                      , resolved_filter
-                     , this
                      , (data) => { 
         console.log( "Main query recv");
         //console.log( data );
@@ -141,7 +140,6 @@ export default class CompRecambiosProformas extends React.Component {
           dbConn.DBSelect( ext_layout.table
                          , ["*"]
                          , resolved_filter
-                         , this
                          , (data) => { 
             //console.log( "Sub query for " + f.field + " recv");
             //console.log( data );
@@ -217,7 +215,6 @@ export default class CompRecambiosProformas extends React.Component {
       this.setState({db_id:new_id});
       dbConn.DBInsert( layout.table
                      , changes
-                     , this
                      , handler );
     } else {
       // Not allowing changes in the key field
@@ -245,7 +242,6 @@ export default class CompRecambiosProformas extends React.Component {
               tasks.push( (callback)=>{
                 dbConn.DBInsert( ext_layout.table
                                , sub_changes
-                               , this
                                , (data)=>{
                                 callback(null);
                 });
@@ -261,7 +257,6 @@ export default class CompRecambiosProformas extends React.Component {
                   dbConn.DBUpdate( ext_layout.table
                                  , sub_changes
                                  , ext_layout.key_field + "="+ ext_id
-                                 , this
                                  , (data)=>{
                                   callback(null);
                   });
@@ -283,7 +278,6 @@ export default class CompRecambiosProformas extends React.Component {
           dbConn.DBUpdate( layout.table
                          , main_changes
                          , layout.key_field + "='"+ this.state.db_id + "'"
-                         , this
                          , handler );
         });
       }

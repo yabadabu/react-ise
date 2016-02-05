@@ -123,21 +123,8 @@ function genInsertSQL( table, fields ) {
 // ----------------------------------------------------------
 function execRequest( inmsg, request_callback ) {
   var tasks= [];
-  if( inmsg.q === "EmpresasLike" ) {
-    taskspush( { sql:genSQL( ['[Número Cliente] as id', 'Empresa as name']
-                      , 'Clientes'
-                      , "[Empresa] like '%" + inmsg.text + "%'"
-                      ) } );
-  }
-  else if( inmsg.q === "EmpresaByID" ) {
-    tasks.push( { single: true
-              , sql:genSQL( ["*"]
-                      , 'Clientes'
-                      , "[Número Cliente] = " + quoted( inmsg.text )
-                      ) } );
-  }
-
-  else if( inmsg.q === "select" ) {
+  
+  if( inmsg.q === "select" ) {
     tasks.push( { sql: genSQL( inmsg.fields, inmsg.table, inmsg.filter ) } );
   } 
 
@@ -152,20 +139,6 @@ function execRequest( inmsg, request_callback ) {
   else if( inmsg.q === "rawSql" ) {
     tasks.push( { sql: inmsg.sql } );
   }
-
-  else if( inmsg.q === "Recambios.Proforma.ByID" ) {
-    tasks.push( 
-      { single: true 
-      , sql: genSQL( ["*"], "[Recambios - Proformas]", "IDProforma = " + quoted( inmsg.text ) ) } );
-    tasks.push( 
-      { root: "details"
-      , sql: genSQL( ["*"], "[Recambios - Proformas - Detalles]", "IDProforma = " + quoted( inmsg.text ) ) } );
-  }
-  else if( inmsg.q === "Recambios.Proforma.Like" ) {
-    tasks.push( 
-      { sql: genSQL( ["IDProforma", "Empresa"], "[Recambios - Proformas]", "IDProforma like '%" + inmsg.text + "%'" ) } );
-  }
-
 
   else {
     request_callback("Invalid query type " + inmsg.q, { status:'ko', data:{} });
@@ -202,9 +175,9 @@ function execRequest( inmsg, request_callback ) {
       console.log( "error!")
       console.log( err );
     }
-    console.log( "Async completed")
+    console.log( "Async completed for queryId:" + inmsg.query_id);
     console.log( JSON.stringify( final_data, null, '  ' ) );
-    request_callback(null, { status:'ok', data:final_data });
+    request_callback(null, { status:'ok', query_id:inmsg.query_id, data:final_data });
   });
 }
 

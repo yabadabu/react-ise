@@ -9,6 +9,8 @@ class DBConnection extends EventEmitter {
     this.callback = null;
     this.is_connected = false;
     this.trace = false;
+    this.next_id = 1;
+    this.running_queries = {};
     this.connectToServer();
   }
 
@@ -45,8 +47,15 @@ class DBConnection extends EventEmitter {
         return;
       }
       if( this.trace ) console.log( json );
-      if( this.callback ) 
-        this.callback.call( this.callback_ctx, json.data );
+      if( json.query_id ) {
+        var cb = this.running_queries[json.query_id]; 
+        if( cb ) {
+          cb( json.data );
+          delete this.running_queries[ json.query_id ];
+        }
+      } else {
+        console.log( "Server recv query answer without a query id!");
+      }
     };
 
     this.connection.onerror = (err) => {
@@ -62,30 +71,37 @@ class DBConnection extends EventEmitter {
   }
 
   // ---------------------------------------------------------------
-  DBSelect( table, fields, filter, callback_ctx, callback ) {
-    this.callback_ctx = callback_ctx;
-    this.callback = callback;
+  launch( arg, callback ) {
+    arg.query_id = this.next_id;
+    //console.log( "Registering queryID " + arg.query_id )
+    this.running_queries[ this.next_id ] = callback;
+    if( this.trace ) console.log( this.next_id, arg );
+    this.next_id++;
+    this.connection.send( JSON.stringify(arg) );
+  }
+
+  // ---------------------------------------------------------------
+  DBSelect( table, fields, filter, callback ) {
     var arg = {q:"select", fields:fields, table:table, filter:filter };
-    if( this.trace ) console.log( arg );
-    this.connection.send( JSON.stringify(arg));
+    this.launch( arg, callback );
   } 
 
   // ---------------------------------------------------------------
-  DBUpdate( table, fields, filter, callback_ctx, callback ) {
-    this.callback_ctx = callback_ctx;
-    this.callback = callback;
+  DBRunSQL( sql, callback ) {
+    var arg = {q:"rawSql", sql:sql };
+    this.launch( arg, callback );
+  } 
+
+  // ---------------------------------------------------------------
+  DBUpdate( table, fields, filter, callback ) {
     var arg = {q:"update", table:table, fields:fields, filter:filter };
-    if( this.trace ) console.log( arg );
-    this.connection.send( JSON.stringify(arg) );
+    this.launch( arg, callback );
   } 
 
   // ---------------------------------------------------------------
   DBInsert( table, fields, callback_ctx, callback ) {
-    this.callback_ctx = callback_ctx;
-    this.callback = callback;
     var arg = {q:"insert", table:table, fields:fields };
-    if( this.trace ) console.log( arg );
-    this.connection.send( JSON.stringify(arg) );
+    this.launch( arg, callback );
   } 
 }
 

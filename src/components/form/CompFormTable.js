@@ -5,6 +5,7 @@ import * as layouts from '../../store/db_layouts.js';
 
 import CompFormTableRow from './CompFormTableRow';
 import CompFormTableLayoutHeaders from './CompFormTableLayoutHeaders';
+import CompFormDataList from './CompFormDataList.js';
 
 const CompFormTable = (props) => {
   const f      = props.field;
@@ -40,12 +41,15 @@ const CompFormTable = (props) => {
   });
 
   return (
+    <div>
+    <CompFormDataList lut="Recambios.REF"/>
     <table>
-      <CompFormTableLayoutHeaders layout={layout}/>
+    <CompFormTableLayoutHeaders layout={layout}/>
     <tbody>
       {data_rows}
     </tbody>
     </table> 
+    </div> 
    );
 };
 

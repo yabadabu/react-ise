@@ -64,7 +64,6 @@ export default class CompSearchDB extends React.Component {
     dbConn.DBSelect( layout.table
                    , fields
                    , all_filters
-                   , this
                    , (data) => {
       //console.log( "Received from the db connection callback" );
       //console.log( data );
