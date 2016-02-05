@@ -12,20 +12,20 @@ export default class CompFormSelect extends React.Component {
 
   componentDidMount() {
     if( cb_select_provincias ) {
-      console.log( "Provincias Select already valid")
+      console.log( "Provincias Select already valid");
       return;
     }
-    console.log( "Sending select of provincias")
+    console.log( "Sending select of provincias");
     dbConn.DBSelect( '[Codigos Provincias]'
                    , ['IDProvincia', 'NameProvincia']
                    , "(1=1)"
                    , this
                    , (data)=>{
-      console.log( "Provincias recv")
+      console.log( "Provincias recv");
       //console.log( data )
       cb_select_provincias = _.map(data,(v)=>{
-        return <MenuItem value={v.IDProvincia.toString()} primaryText={v.NameProvincia}/>
-      })
+        return <MenuItem value={v.IDProvincia.toString()} primaryText={v.NameProvincia}/>;
+      });
       this.forceUpdate();
     });
   }

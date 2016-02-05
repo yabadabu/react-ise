@@ -11,18 +11,13 @@ import ActionDelete from 'material-ui/lib/svg-icons/action/delete';
 export default class CompFormTableRow extends React.Component {
 
   onAutoCompleteChanges( new_value ) {
-    console.log( "RowAutoComplete", new_value )
+    console.log( "RowAutoComplete", new_value );
     //props.onChange.bind(this, f, unique_id, row_idx)}
-  }
-
-  onClick( f, row) {
-    console.log( f.field, row );
   }
 
   render() {
 
     //console.log( this.props.layout );
-    var key = 1;
     var row = [];
     var layout = this.props.layout;
     var values = this.props.values;
@@ -38,7 +33,6 @@ export default class CompFormTableRow extends React.Component {
 
       if( f.type === "text" || f.type == "number" || f.type == "money") { 
         value = (<CompFormText 
-                    key={key} 
                     field={f} 
                     value={value} 
                     inside_table 
@@ -69,31 +63,26 @@ export default class CompFormTableRow extends React.Component {
 
       // Show the Name, and store the ID in the field. Provincias for example
       else if( f.type === "lut" ) {
-        var str_value = value ? value.toString : null
+        var str_value = value ? value.toString : null;
         value = (<CompFormAutoComplete 
-                    key={key} 
                     field={f} 
                     value={str_value} 
                     onChange={this.onAutoCompleteChanges.bind(this)}
-                    />)
+                    />);
       }
       
       else if( f.type === "action" ) {
         value = (<ActionDelete 
-            key={key}
-            onClick={this.onClick.bind(this,f,row)}
+            onClick={this.props.onClick.bind(this,f,unique_id,row_idx)}
           />);
       }
 
-      key++;
-
-      row.push( <td key={key}>{value}</td>);
-      key++;
+      row.push( <td key={f.field}>{value}</td>);
     });
 
     //console.log( headers_row );
     return (
-      <tr row_idx={row_idx}>
+      <tr row_idx={unique_id}>
       {row}
       </tr>
     );
@@ -105,6 +94,7 @@ CompFormTableRow.propTypes = {
 , values: PropTypes.object.isRequired
 , row_idx: PropTypes.number.isRequired
 , onChange: PropTypes.func.isRequired
+, onClick: PropTypes.func
 };
 
 export default CompFormTableRow;

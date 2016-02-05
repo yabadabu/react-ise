@@ -31,7 +31,7 @@ var all_combos = {
 
         this.luts[ k ] = lut;
       });
-    })
+    });
   }
 };
 
@@ -40,7 +40,7 @@ dbConn.on( 'DB.connectionStatusChanged', (connected)=>{
     return;
   console.log( "Combo aware of db connected", all_combos.executed);
   all_combos.queryData();
-})
+});
 
 export default all_combos;
 

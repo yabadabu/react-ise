@@ -53,6 +53,24 @@ export default class CompEditForm extends React.Component {
     //console.log( new_data );
     this.handleHandle( main_field, new_data); 
   }
+
+  handleTableClick( main_field, external_field, external_id, external_idx ) {
+    console.log( "at handleTableClick" );
+    console.log( this );
+    console.log( main_field );        // details
+    console.log( external_field );    // f.field = Delete
+    console.log( external_id );       // unique id of the row
+    console.log( external_idx );      // index in props
+    console.log( this.props.data );
+
+    var rows = this.props.data[main_field.field];
+    console.log( "About to delete row idx ", external_idx, " from ", rows);
+    //rows.splice( external_idx, 1 );
+    delete rows[ external_idx ];
+    //console.log( new_data );
+    this.handleHandle( main_field, rows); 
+  }
+
   handleAddNewDetailOnTable( f ) {
     console.log( "Adding new item" );
     console.log( f );
@@ -106,7 +124,9 @@ export default class CompEditForm extends React.Component {
         if( this.props.creating_new )
           continue;
         entries.push(
-          <CompFormTable field={f} value={value} key={key} onChange={this.handleTableChange.bind(this,f)}/>
+          <CompFormTable field={f} value={value} key={key}
+                         onClick={this.handleTableClick.bind(this,f)}
+                         onChange={this.handleTableChange.bind(this,f)}/>
         );
         if( value.length > 0 && value[ value.length-1 ] && !value[ value.length-1 ]._is_new ) {
           key++;

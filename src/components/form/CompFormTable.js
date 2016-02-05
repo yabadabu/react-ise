@@ -28,15 +28,21 @@ const CompFormTable = (props) => {
   var row_idx = 0;
   var data_rows = [];
   _.forEach( values, (row_values)=>{
-    // For each field
-    var row = (<CompFormTableRow 
-                  layout={layout} 
-                  values={row_values} 
-                  onChange={handleChanges}
-                  row_idx={row_idx}
-                  key={row_idx}
-                  />);
-    data_rows.push(row);
+
+    // Discard delete subrows
+    if( row_values ) {
+      
+      // For each field
+      var row = (<CompFormTableRow 
+                    layout={layout} 
+                    values={row_values} 
+                    onChange={handleChanges}
+                    onClick={props.onClick}
+                    row_idx={row_idx}
+                    key={row_idx}
+                    />);
+      data_rows.push(row);
+    }
     row_idx++;
   });
 
@@ -53,10 +59,11 @@ const CompFormTable = (props) => {
    );
 };
 
-
 CompFormTable.propTypes = {
   field: PropTypes.object.isRequired,
-  value: PropTypes.array.isRequired
+  value: PropTypes.array.isRequired,
+  onChange: PropTypes.func,
+  onClick: PropTypes.func
 };
 
 export default CompFormTable;
