@@ -41,7 +41,7 @@ export default class CompFormAutoComplete extends React.Component {
 
     return (
       <AutoComplete
-        floatingLabelText={f.field}
+        floatingLabelText={f.title}
         filter={AutoComplete.caseInsensitiveFilter}
         searchText={text_value}
         onNewRequest={this.onNewRequest.bind(this)}

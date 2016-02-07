@@ -13,7 +13,7 @@ export default class CompFormText extends React.Component {
     //console.log( "TextRendering");
     const props = this.props;
     const f     = props.field;
-    const label = props.inside_table ? "" : f.field;
+    const label = props.inside_table ? "" : (f.title ? f.title : f.field);
     const disabled = f.read_only && !props.creating_new;
     let style = f.style;
     let inputStyle = f.inputStyle;
