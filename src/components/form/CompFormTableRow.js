@@ -31,7 +31,7 @@ export default class CompFormTableRow extends React.Component {
 
       var value = values[f.field];
 
-      if( f.type === "text" || f.type == "number" || f.type == "money") { 
+      if( f.type === "text" || f.type == "number" ) { 
         value = (<CompFormText 
                     field={f} 
                     value={value} 
@@ -71,13 +71,21 @@ export default class CompFormTableRow extends React.Component {
                     />);
       }
       
+      else if( f.type === "computed" ) {
+        value = f.formula( values );
+      }
+      
       else if( f.type === "action" ) {
         value = (<ActionDelete 
             onClick={this.props.onClick.bind(this,f,unique_id,row_idx)}
           />);
       }
 
-      row.push( <td key={f.field}>{value}</td>);
+      var style = {};
+      if( f.format === "currency" ) 
+        style["textAlign"] = "right";
+
+      row.push( <td key={f.field} style={style}>{value}</td>);
     });
 
     //console.log( headers_row );

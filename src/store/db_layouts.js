@@ -1,5 +1,9 @@
 import _ from 'lodash';
 
+function as_euros(x) {
+  return x ? (x.toFixed(2) + " €") : "0 €";
+}
+
 const all_layouts = {
   proforma: {
     class_name: "proforma",
@@ -22,7 +26,7 @@ const all_layouts = {
     fields: [
       //{ field:"Search", type:"action", hint:"Buscar una empresa" },
       { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"10%"} },
-      { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"50%"} },
+      { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"40%"} },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
       { type:"separator"} ,
       { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
@@ -51,11 +55,16 @@ const all_layouts = {
                         , lut:"Recambios.REF", link:"REF", hint:"Referencia"
                         , column_style:{width:"300px"}
                         },
-      { field:"Cantidad", type:"number" },
-      { field:"EurosUnidad", type:"money", title:"€/Unidad" },
-      { field:"Total", type:"money" },
+      { field:"Cantidad", type:"number"
+                        , column_style:{width:"120px"}
+       },
+      { field:"EurosUnidad", type:"number", title:"€/Unidad", format:"currency"
+                        , column_style:{width:"120px"}
+       },
+      { field:"SubTotal", type:"computed", format:"currency"
+                        , formula:(row)=>{return as_euros(row.Cantidad * row.EurosUnidad)}},
       { field:"Tipo", type:"number" },
-      { field:"Delete", type:"action", title:" " }
+      { field:"Delete", type:"action", title:"Borrar" }
      // { field:"Nota", type:"text" }
     ]
   }

@@ -28,7 +28,7 @@ export default class CompFormTableLayoutHeaders extends React.Component {
       var title = f.field;
       if( f.title ) 
         title = f.title;
-      if( f.type == "number" || f.type == "money") 
+      if( f.type === "number" || f.format === "currency") 
         style.textAlign = ["right"];
       headers_row.push( <th key={key} style={style}>{title}</th> );
       //headers_row.push( <div>{title}</div> );

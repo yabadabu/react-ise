@@ -19,7 +19,7 @@ export default class CompFormText extends React.Component {
     let inputStyle = f.inputStyle;
     if( !inputStyle ) inputStyle = {};
     if( !style ) style = {};
-    if( f.type === "number" || f.type === "money") {
+    if( f.type === "number" || f.format === "currency") {
       inputStyle["textAlign"] = "right";
       style["width"] = null;
     }
