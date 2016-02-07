@@ -188,9 +188,9 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   // --------------------------------------------------------------
-  onClickCancel( e, dummy  ) {
+  onClickUndo( e, dummy  ) {
     console.log( "Restoring...");
-    this.validateData({db_data:this.state.db_orig_data});
+    this.validateData({db_data:this.state.db_orig_data}, true);
   }
 
   // --------------------------------------------------------------
@@ -365,7 +365,7 @@ export default class CompRecambiosProformas extends React.Component {
         <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
         <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
         <IconButton disabled={!changed && !is_new} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
-        <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickCancel.bind(this)}><ActionUndo/></IconButton>
+        <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickUndo.bind(this)}><ActionUndo/></IconButton>
         <IconButton disabled={!changed} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
       </CardActions>);
   }
