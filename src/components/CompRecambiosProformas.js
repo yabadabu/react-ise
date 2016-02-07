@@ -222,6 +222,14 @@ export default class CompRecambiosProformas extends React.Component {
       dbConn.DBInsert( layout.table
                      , changes
                      , handler );
+
+    } else if( changes._deleted ) {
+      var filter = layout.key_field + "='"+ this.state.db_id + "'";
+      console.log( "Deleting register ... " + filter);
+      dbConn.DBDelete( layout.table
+                     , filter
+                     , handler );
+      this.onClickSearchAgain();
     } else {
       // Not allowing changes in the key field
       var main_required = false;
@@ -311,7 +319,7 @@ export default class CompRecambiosProformas extends React.Component {
 
   // --------------------------------------------------------------
   onClickDelete( ) {
-    this.setState({modal_dlg_open:true}, {modal_dlg_msg:"¿Borrar completamente el registro?"});
+    this.setState({modal_dlg_open:true, modal_dlg_msg:"¿Borrar completamente el registro?"});
   }
 
   // --------------------------------------------------------------
@@ -377,7 +385,7 @@ export default class CompRecambiosProformas extends React.Component {
         <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
         <IconButton disabled={!changed && !is_new} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
         <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickUndo.bind(this)}><ActionUndo/></IconButton>
-        <IconButton disabled={!changed} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
+        <IconButton disabled={changed} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
       </CardActions>);
   }
 
@@ -403,8 +411,15 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   renderModalDialog() {
-    var handler_no = ()=>{this.setState({modal_dlg_open: false});};
-    var handler_yes = ()=>{this.setState({modal_dlg_open: false});};
+    var handler_no = ()=>{
+      this.setState({modal_dlg_open: false});
+    };
+    var handler_yes = ()=>{
+      this.setState({modal_dlg_open: false});
+      var new_db_data = this.state.db_data;
+      new_db_data._deleted = true;
+      this.validateData( {db_data:new_db_data} );
+    };
     var actions = (
       <CardActions >
       <RaisedButton label="No" onClick={handler_no}/>
@@ -443,9 +458,12 @@ export default class CompRecambiosProformas extends React.Component {
     var json = this.state.trace ? JSON.stringify( this.state, null, '  ' ) : "";
 
     if( this.state.trace ) {
+     json = "State: " + JSON.stringify( this.state, null, '  ' ) + "\n";
+     /*
      json = "delta: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
      json += "db.details: " + JSON.stringify( this.state.db_data.details, null, '  ' ) + "\n";
      json += "orig.details: " + JSON.stringify( this.state.db_orig_data.details, null, '  ' );
+      */
     }
     //console.log( this.state );
     return (<div>{save}{form}<Divider />{msg}{dlg}<pre>{json}</pre></div>);

@@ -55,6 +55,7 @@ export default class CompEditForm extends React.Component {
   }
 
   handleTableClick( main_field, external_field, external_id, external_idx ) {
+    /*
     console.log( "at handleTableClick" );
     console.log( this );
     console.log( main_field );        // details
@@ -62,9 +63,9 @@ export default class CompEditForm extends React.Component {
     console.log( external_id );       // unique id of the row
     console.log( external_idx );      // index in props
     console.log( this.props.data );
-
+    */
     var rows = this.props.data[main_field.field];
-    console.log( "About to delete row idx ", external_idx, " from ", rows);
+    //console.log( "About to delete row idx ", external_idx, " from ", rows);
     //rows.splice( external_idx, 1 );
     rows[ external_idx ]._deleted = true;
     //console.log( new_data );
@@ -99,6 +100,7 @@ export default class CompEditForm extends React.Component {
         continue;
       } 
       let value = obj[ f.field ];
+      let str_value = value ? value.toString() : null;
 
       if( f.type === "text" ) {
         entries.push( 
@@ -107,7 +109,7 @@ export default class CompEditForm extends React.Component {
 
       } else if( f.type === "lut" ) {
         entries.push( 
-          <CompFormAutoComplete field={f} value={value.toString()} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
+          <CompFormAutoComplete field={f} value={str_value} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
         );
 
       } else if( f.type === "date" ) {
@@ -117,7 +119,7 @@ export default class CompEditForm extends React.Component {
 
       } else if( f.type === "select" ) {
         entries.push(
-          <CompFormSelect field={f} value={value.toString()} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
+          <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
         );
 
       } else if( f.type === "array_table" ) {
@@ -128,7 +130,7 @@ export default class CompEditForm extends React.Component {
                          onClick={this.handleTableClick.bind(this,f)}
                          onChange={this.handleTableChange.bind(this,f)}/>
         );
-        if( value.length > 0 && value[ value.length-1 ] && !value[ value.length-1 ]._is_new ) {
+        if( value.length === 0 || !_.last( value )._is_new ) {
           key++;
           entries.push( 
             <CardActions key={key} >
