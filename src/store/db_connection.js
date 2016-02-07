@@ -99,7 +99,13 @@ class DBConnection extends EventEmitter {
   } 
 
   // ---------------------------------------------------------------
-  DBInsert( table, fields, callback_ctx, callback ) {
+  DBDelete( table, filter, callback ) {
+    var arg = {q:"delete", table:table, filter:filter };
+    this.launch( arg, callback );
+  } 
+
+  // ---------------------------------------------------------------
+  DBInsert( table, fields, callback ) {
     var arg = {q:"insert", table:table, fields:fields };
     this.launch( arg, callback );
   } 

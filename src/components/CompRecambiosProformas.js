@@ -47,14 +47,20 @@ function getPropertiesOfAChangedFromB( a, b ) {
     if( Array.isArray( a[k] ) ) {
       var array_diff = [];
       //console.log( "Comparing", a[k], b[k] );
-      for( var q in a[k]) 
+      for( var q in a[k]) {
         array_diff[ q ] = getPropertiesOfAChangedFromB( a[k][q], b[k][q] );
+        //console.log( "Comparing ", q, a[k][q], b[k][q], "yields", array_diff[q] );
+      }
       diffs[k] = array_diff;
     } 
-    else if( b[k] ) {
+    else if( b[k] ) { 
       if( ( typeof a[k] == undefined ) || b[k].toString() !== a[k].toString() ) {
         diffs[k] = a[k];
-      } 
+      }
+    }
+    else {
+      if( a[k] )
+        diffs[k] = a[k];
     }
   }
   return diffs;
@@ -242,9 +248,8 @@ export default class CompRecambiosProformas extends React.Component {
               tasks.push( (callback)=>{
                 dbConn.DBInsert( ext_layout.table
                                , sub_changes
-                               , (data)=>{
-                                callback(null);
-                });
+                               , callback 
+                               );
               });
 
             } else {
@@ -254,12 +259,18 @@ export default class CompRecambiosProformas extends React.Component {
                 var ext_id = this.state.db_data[k][idx][ext_key_field];
                 console.log( ext_layout.key_field + "="+ ext_id );
                 tasks.push( (callback)=>{
-                  dbConn.DBUpdate( ext_layout.table
-                                 , sub_changes
-                                 , ext_layout.key_field + "="+ ext_id
-                                 , (data)=>{
-                                  callback(null);
-                  });
+                  if( sub_changes._deleted ) {
+                    dbConn.DBDelete( ext_layout.table 
+                                   , ext_layout.key_field + "="+ ext_id
+                                   , callback
+                                   );
+                  } else {
+                    dbConn.DBUpdate( ext_layout.table
+                                   , sub_changes
+                                   , ext_layout.key_field + "="+ ext_id
+                                   , callback 
+                                   );
+                  }
                 });
               }
             }
@@ -281,7 +292,7 @@ export default class CompRecambiosProformas extends React.Component {
                          , handler );
         });
       }
-      async.series( tasks, (callback)=> {
+      async.series( tasks, (err)=> {
         console.log( "All updated!");
         handler();
       });

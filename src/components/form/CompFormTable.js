@@ -30,7 +30,7 @@ const CompFormTable = (props) => {
   _.forEach( values, (row_values)=>{
 
     // Discard delete subrows
-    if( row_values ) {
+    if( row_values && !row_values._deleted ) {
       
       // For each field
       var row = (<CompFormTableRow 

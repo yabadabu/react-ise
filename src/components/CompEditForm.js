@@ -66,7 +66,7 @@ export default class CompEditForm extends React.Component {
     var rows = this.props.data[main_field.field];
     console.log( "About to delete row idx ", external_idx, " from ", rows);
     //rows.splice( external_idx, 1 );
-    delete rows[ external_idx ];
+    rows[ external_idx ]._deleted = true;
     //console.log( new_data );
     this.handleHandle( main_field, rows); 
   }

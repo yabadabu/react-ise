@@ -73,10 +73,12 @@ function quoted( x ) {
   return "'" + x + "'";
 }
 
+// ----------------------------------------------------------
 function genSQL( fields, table, filter ) {
   return 'select ' + fields.join(", ") + ' from ' + table + ' where ' + filter;
 }
 
+// ----------------------------------------------------------
 function genUpdateSQL( table, fields, filter ) {
   console.log( "genUpdateSQL" )
   console.log( table )
@@ -98,6 +100,7 @@ function genUpdateSQL( table, fields, filter ) {
 }
 
 
+// ----------------------------------------------------------
 function genInsertSQL( table, fields ) {
   console.log( "genInsertSQL" )
   console.log( table )
@@ -119,6 +122,14 @@ function genInsertSQL( table, fields ) {
   return sql;
 }
 
+// ----------------------------------------------------------
+function genDeleteSQL( table, filter ) {
+  console.log( "genDeleteSQL" )
+  console.log( table )
+  console.log( filter )
+  sql = "DELETE FROM " + table + " WHERE " + filter;
+  return sql;
+}
 
 // ----------------------------------------------------------
 function execRequest( inmsg, request_callback ) {
@@ -134,6 +145,10 @@ function execRequest( inmsg, request_callback ) {
 
   else if( inmsg.q === "insert" ) {
     tasks.push( { sql: genInsertSQL( inmsg.table, inmsg.fields ) } );
+  } 
+
+  else if( inmsg.q === "delete" ) {
+    tasks.push( { sql: genDeleteSQL( inmsg.table, inmsg.filter ) } );
   } 
 
   else if( inmsg.q === "rawSql" ) {
@@ -181,6 +196,7 @@ function execRequest( inmsg, request_callback ) {
   });
 }
 
+// ----------------------------------------------------------
 function test( ) {
   var r = {q:"PiezasFacturaByID", text:"01-I0951"};
   r = {q:"PiezasFacturasLike", text:"01-I0988"};
