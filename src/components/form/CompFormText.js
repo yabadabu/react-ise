@@ -23,6 +23,9 @@ export default class CompFormText extends React.Component {
       inputStyle["textAlign"] = "right";
       style["width"] = null;
     }
+    var errorText = null;
+    if( !f.can_be_null && props.value === null )
+      errorText = "Campo requerido.";
     return (
       <TextField 
         className="form_input"
@@ -35,6 +38,7 @@ export default class CompFormText extends React.Component {
         multiLine={f.multiLine}
         id={f.field}
         disabled={disabled}
+        errorText={errorText}
         onChange={props.onChange}
         />
     );

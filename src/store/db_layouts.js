@@ -35,7 +35,7 @@ const all_layouts = {
       { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
       { field:"IDProvincia", type:"lut", lut:"Provincias.ID", title:"Provincia", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
-      { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true },
+      { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true, can_be_null:true },
       { field:"details", type:"array_table", layout:"proforma_details"
                        , local:"IDProforma", remote:"IDProforma"
                        }
@@ -65,7 +65,7 @@ const all_layouts = {
        },
       { field:"SubTotal", type:"computed", className:"currency"
                         , formula:(row)=>{return as_euros(row.Cantidad * row.EurosUnidad)}},
-      { field:"Tipo", type:"number" },
+      { field:"Tipo", type:"number", default_value:0 },
       { field:"Delete", type:"action", title:"Borrar" }
      // { field:"Nota", type:"text" }
     ],
@@ -149,7 +149,7 @@ export function getNewEmptyRegister( layout ) {
       else if( f.type == "lut_text" || f.type =="action")
         return;
       else 
-        data[f.field] = null;
+        data[f.field] = f.default_value;
     } 
   });
   return data;
