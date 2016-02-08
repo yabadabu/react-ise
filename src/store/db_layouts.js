@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 function as_euros(x) {
-  return x ? (x.toFixed(2) + " €") : "0 €";
+  return x ? (x.toFixed(2)) : "0";
 }
 
 const all_layouts = {
@@ -36,7 +36,9 @@ const all_layouts = {
       { field:"IDProvincia", type:"lut", lut:"Provincias.ID", title:"Provincia", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
       { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true },
-      { field:"details", type:"array_table", layout:"proforma_details", local:"IDProforma", remote:"IDProforma" }
+      { field:"details", type:"array_table", layout:"proforma_details"
+                       , local:"IDProforma", remote:"IDProforma"
+                       }
     ]
   },
   proforma_details: {
@@ -58,14 +60,26 @@ const all_layouts = {
       { field:"Cantidad", type:"number"
                         , column_style:{width:"120px"}
        },
-      { field:"EurosUnidad", type:"number", title:"€/Unidad", format:"currency"
+      { field:"EurosUnidad", type:"number", title:"€/Unidad"
                         , column_style:{width:"120px"}
        },
-      { field:"SubTotal", type:"computed", format:"currency"
+      { field:"SubTotal", type:"computed", className:"currency"
                         , formula:(row)=>{return as_euros(row.Cantidad * row.EurosUnidad)}},
       { field:"Tipo", type:"number" },
       { field:"Delete", type:"action", title:"Borrar" }
      // { field:"Nota", type:"text" }
+    ],
+    tail_fields: [
+      { field:"New", type:"actionNew", title:"New Detail", colSpan:"3" },
+      { field:"Total", type:"label" },    
+      { field:"ComputedTotal", type:"computed", className:"currency", formula:(rows)=>{ 
+          return as_euros(
+            _.reduce(rows, (accum,d)=>{ 
+              accum += (d.Cantidad*d.EurosUnidad);
+              return accum;
+            }, 0)
+          );
+      }}    
     ]
   }
 };

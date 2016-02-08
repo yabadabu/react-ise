@@ -6,6 +6,7 @@ import * as layouts from '../../store/db_layouts.js';
 import CompFormTableRow from './CompFormTableRow';
 import CompFormTableLayoutHeaders from './CompFormTableLayoutHeaders';
 import CompFormDataList from './CompFormDataList.js';
+import CompFormTableTailRow from './CompFormTableTailRow';
 
 const CompFormTable = (props) => {
   const f      = props.field;
@@ -46,6 +47,17 @@ const CompFormTable = (props) => {
     row_idx++;
   });
 
+  // A last row to show the "Add Detail" button and some totals 
+  if( layout.tail_fields ) {
+    var tail_row = (<CompFormTableTailRow 
+                  layout={layout} 
+                  values={values} 
+                  key={row_idx}
+                  onClickNew={props.onClickNew}
+                  />);
+    data_rows.push(tail_row);
+  }
+
   return (
     <div>
     <CompFormDataList lut="Recambios.REF"/>
@@ -63,7 +75,8 @@ CompFormTable.propTypes = {
   field: PropTypes.object.isRequired,
   value: PropTypes.array.isRequired,
   onChange: PropTypes.func,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  onClickNew: PropTypes.func
 };
 
 export default CompFormTable;

@@ -250,13 +250,22 @@ export default class CompRecambiosProformas extends React.Component {
               
               delete sub_changes._is_new;           // Remove _is_new because it's not a field
               delete sub_changes[ext_key_field];    // Remove .ID as it's autoincremented
+
+              // Remove computed fields
+              const changes_to_save = _.reduce(sub_changes, (accum,v,k)=>{
+                var field = layouts.getFieldByname( ext_layout, k );
+                if( field.type !== "computed" )
+                  accum[ k ] = v;
+                return accum;
+              }, {});
+
               // Add the link field. remote.IDProforma = main_table.IDProforma
-              sub_changes[ searched_field.remote ] = this.state.db_data[ searched_field.local ];
+              changes_to_save[ searched_field.remote ] = this.state.db_data[ searched_field.local ];
 
               tasks.push( (callback)=>{
                 dbConn.DBInsert( ext_layout.table
-                               , sub_changes
-                               , callback 
+                               , changes_to_save
+                               , (data)=>{ callback(null); } 
                                );
               });
 
@@ -265,18 +274,20 @@ export default class CompRecambiosProformas extends React.Component {
               if( Object.keys( sub_changes ).length ) {
                 console.log( sub_changes );
                 var ext_id = this.state.db_data[k][idx][ext_key_field];
-                console.log( ext_layout.key_field + "="+ ext_id );
+                var filter = ext_layout.key_field + "="+ ext_id;
+                console.log( filter );
                 tasks.push( (callback)=>{
+                  console.log( "Fileter is ", filter );
                   if( sub_changes._deleted ) {
                     dbConn.DBDelete( ext_layout.table 
-                                   , ext_layout.key_field + "="+ ext_id
-                                   , callback
+                                   , filter
+                                   , (data)=>{ callback(null); } 
                                    );
                   } else {
                     dbConn.DBUpdate( ext_layout.table
                                    , sub_changes
-                                   , ext_layout.key_field + "="+ ext_id
-                                   , callback 
+                                   , filter
+                                   , (data)=>{ callback(null); } 
                                    );
                   }
                 });
@@ -302,7 +313,9 @@ export default class CompRecambiosProformas extends React.Component {
       }
       async.series( tasks, (err)=> {
         console.log( "All updated!");
-        handler();
+        console.log( err );
+        if( !err )
+          handler();
       });
     }
   }

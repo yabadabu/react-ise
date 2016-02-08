@@ -1,4 +1,3 @@
-- Auto completed values, like total = €/unidad * Cantidad.
 - Return to search results after removing a record
   - delete search results or the deleted record
 - Get quoted/non quoted unique id filter queries automatically
@@ -8,8 +7,9 @@
   - Popup to confirm
 - Add methods .getField to each layout
 - Notify invalid values in the form
-- Table row align headers with data fields
 
++ Auto completed values, like total = €/unidad * Cantidad.
++ Table row align headers with data fields
 + Delete full record
 + Add display in the fields
 + Save still shows as active, even when write has completed

@@ -45,10 +45,14 @@ table.search_results tr:nth-child(odd) {
   background-color:#fff;
 }
 
+.currency {
+  text-align:right
+}
+.currency::after { content: " €" }
+
 div.main_section {
   zIndex: 0;
   width: '100%';
-  color: 'red';
 }
 
 div.proforma {

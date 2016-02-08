@@ -122,21 +122,28 @@ export default class CompEditForm extends React.Component {
           <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
         );
 
+      } else if( f.type === "computed" ) {
+        var computed_value = f.formula( obj );
+        entries.push(
+          <TextField 
+            className="form_input"
+            hintText={f.hint}
+            value={computed_value}
+            disabled
+            id={f.field}
+            />
+        );
+
       } else if( f.type === "array_table" ) {
         if( this.props.creating_new )
           continue;
         entries.push(
           <CompFormTable field={f} value={value} key={key}
                          onClick={this.handleTableClick.bind(this,f)}
-                         onChange={this.handleTableChange.bind(this,f)}/>
+                         onChange={this.handleTableChange.bind(this,f)}
+                         onClickNew={this.handleAddNewDetailOnTable.bind(this,f)}
+                         />
         );
-        if( value.length === 0 || !_.last( value )._is_new ) {
-          key++;
-          entries.push( 
-            <CardActions key={key} >
-            <RaisedButton label="New Detail" onClick={this.handleAddNewDetailOnTable.bind(this,f)} />
-            </CardActions>);
-        }
 
       } else if( f.type === "action" ) {
         entries.push( (

@@ -76,16 +76,13 @@ export default class CompFormTableRow extends React.Component {
       }
       
       else if( f.type === "action" ) {
-        value = (<ActionDelete 
-            onClick={this.props.onClick.bind(this,f,unique_id,row_idx)}
-          />);
+        if( !values["_is_new"] )
+          value = (<ActionDelete 
+              onClick={this.props.onClick.bind(this,f,unique_id,row_idx)}
+            />);
       }
 
-      var style = {};
-      if( f.format === "currency" ) 
-        style["textAlign"] = "right";
-
-      row.push( <td key={f.field} style={style}>{value}</td>);
+      row.push( <td key={f.field} className={f.className}>{value}</td>);
     });
 
     //console.log( headers_row );
