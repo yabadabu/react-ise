@@ -10,11 +10,12 @@ import CompFormAutoComplete from './form/CompFormAutoComplete.js';
 import CompFormTable from './form/CompFormTable.js';
 import CompFormSelect from './form/CompFormSelect.js';
 
-import CardActions from 'material-ui/lib/card/card-actions';
-import FlatButton from 'material-ui/lib/flat-button';
-import Tooltip from 'material-ui/lib/tooltip';
 import * as layouts from '../store/db_layouts.js';
 
+// -------------------------------------------------------------
+// From a layout creates instances of form components
+// all data changes are forwarded to the props
+// -------------------------------------------------------------
 export default class CompEditForm extends React.Component {
 
   handleHandle( field, new_value ) {
@@ -96,7 +97,7 @@ export default class CompEditForm extends React.Component {
       key++;
       const f = cfg.fields[ idx ];
       if( f.type === "separator" ) {
-        entries.push( <div key={key}></div> );
+        entries.push( <div key={key}></div>);
         continue;
       } 
       let value = obj[ f.field ];
@@ -135,6 +136,7 @@ export default class CompEditForm extends React.Component {
         );
 
       } else if( f.type === "array_table" ) {
+        // Don't show the details if we are still creating the main record
         if( this.props.creating_new )
           continue;
         entries.push(

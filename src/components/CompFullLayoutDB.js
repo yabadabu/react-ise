@@ -25,6 +25,9 @@ import CompEditForm from './CompEditForm';
 import RaisedButton from 'material-ui/lib/raised-button';
 import CardActions from 'material-ui/lib/card/card-actions';
 
+// --------------------------------------------------------------------
+// Comp to integrate searchs, editable layout, db access.
+// --------------------------------------------------------------------
 function getPropertiesOfAChangedFromB( a, b ) {
   //console.log( "getPropertiesOfAChangedFromB", a, b );
   if( !a )
