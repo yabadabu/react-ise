@@ -5,9 +5,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import CompSideMenu from '../components/CompSideMenu';
-import CompCompanyDetails from '../components/CompCompanyDetails';
-import CompPiezasFacturasDetails from '../components/CompPiezasFacturasDetails';
-import CompRecambiosProformas from '../components/CompRecambiosProformas';
+import CompFullLayoutDB from '../components/CompFullLayoutDB';
 
 import AppBar from 'material-ui/lib/app-bar';
 import Paper from 'material-ui/lib/paper';
@@ -29,12 +27,11 @@ class AppMain extends React.Component {
 
     // The generated details
     var section_details;
-    if( main_section === "Empresas" ) 
-      section_details = (<CompCompanyDetails/>);
-    else if( main_section === "Piezas Facturas" ) 
-      section_details = (<CompPiezasFacturasDetails/>);
-    else if( main_section === "Recambios Proformas" ) 
-      section_details = (<CompRecambiosProformas/>);
+    //if( main_section === "Empresas" ) section_details = (<CompCompanyDetails/>);
+    //else 
+    //if( main_section === "Piezas Facturas" ) section_details = (<CompPiezasFacturasDetails/>);
+    //else 
+    if( main_section === "Recambios Proformas" ) section_details = (<CompFullLayoutDB layout="proforma"/>);
     else
       section_details = (<div>{main_section} not implemented</div>);
     // App main is viewing {main_section}

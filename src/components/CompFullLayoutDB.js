@@ -25,8 +25,6 @@ import CompEditForm from './CompEditForm';
 import RaisedButton from 'material-ui/lib/raised-button';
 import CardActions from 'material-ui/lib/card/card-actions';
 
-const layout = layouts.get( "proforma" );
-
 function getPropertiesOfAChangedFromB( a, b ) {
   //console.log( "getPropertiesOfAChangedFromB", a, b );
   if( !a )
@@ -67,7 +65,7 @@ function getPropertiesOfAChangedFromB( a, b ) {
 }
 
 // -----------------------------------------------------------------
-export default class CompRecambiosProformas extends React.Component {
+export default class CompFullLayoutDB extends React.Component {
   
   constructor(props) {
     super(props);
@@ -84,6 +82,7 @@ export default class CompRecambiosProformas extends React.Component {
     , modal_dlg_open: false
     , search_state: null
     , trace: 0
+    , layout: layouts.get( props.layout )
     };
   }
 
@@ -108,6 +107,8 @@ export default class CompRecambiosProformas extends React.Component {
     // Prepare the main query and the subqueries
     var db_all_results = {};
     var tasks = [];
+    const layout = this.state.layout;
+
     tasks.push( (callback)=>{
       // Main query
       console.log( "Retrieving main data for key " + e );
@@ -170,7 +171,7 @@ export default class CompRecambiosProformas extends React.Component {
   // --------------------------------------------------------
   validateData( ns, save_as_orig_data ) {
     if( ns.db_data ) {
-      layouts.validateDates( layout, ns.db_data );
+      layouts.validateDates( this.state.layout, ns.db_data );
       if( save_as_orig_data ) {
         // Get an independent copy of the db_data
         ns.db_orig_data = _.cloneDeep( ns.db_data );
@@ -204,6 +205,7 @@ export default class CompRecambiosProformas extends React.Component {
     if( !this.state.db_changed_rec && !this.state.db_creating_new )
       return;
     console.log( "Saving...");
+    const layout = this.state.layout;
     var changes = this.state.db_delta;
     console.log( changes );
 
@@ -325,6 +327,7 @@ export default class CompRecambiosProformas extends React.Component {
   // --------------------------------------------------------------
   onClickNew( ) {
     console.log( "New register...");
+    const layout = this.state.layout;
     const new_db_data = layouts.getNewEmptyRegister( layout );
     this.validateData( 
       { db_data: new_db_data
@@ -375,9 +378,9 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   renderSearchForm() {
-    var code = JSON.stringify( layout, null, '  ' );
+    var code = JSON.stringify( this.state.layout, null, '  ' );
     return (<CompSearchDB 
-        data={layout} 
+        layout={this.state.layout} 
         onClickNew={this.onClickNew.bind(this)}
         onClickSearchResult={this.onClickSearchResult.bind(this)}
         search_state={this.state.search_state}
@@ -395,12 +398,13 @@ export default class CompRecambiosProformas extends React.Component {
     const buttons_group_style = {float:"right"};
     var changed = this.state.db_changed_rec;
     var is_new = this.state.db_creating_new;
+
+    //    <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
+    //    <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
     return (
       <CardActions expandable style={buttons_group_style}>
         <IconButton tooltip="Dev" onClick={this.onClickDevOptions.bind(this)}><ActionBuild/></IconButton>
         <IconButton tooltip="Buscar de nuevo" onClick={this.onClickSearchAgain.bind(this)}><ActionSearch/></IconButton>
-        <IconButton tooltip="Copiar Valores" onClick={this.onClickCopy.bind(this)}><ActionCopy/></IconButton>
-        <IconButton tooltip="Pegar Valores" onClick={this.onClickPaste.bind(this)}><ActionPaste/></IconButton>
         <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
         <IconButton disabled={!changed && !is_new} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
         <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickUndo.bind(this)}><ActionUndo/></IconButton>
@@ -414,7 +418,7 @@ export default class CompRecambiosProformas extends React.Component {
         data={this.state.db_data} 
         onChange={this.onDataChange.bind(this)} 
         onClick={this.onClick.bind(this)} 
-        layout={layout}
+        layout={this.state.layout}
         creating_new={this.state.db_creating_new}
         />);
   }
@@ -481,7 +485,6 @@ export default class CompRecambiosProformas extends React.Component {
     } else if( this.state.trace == 2 ) {
      json = "State: " + JSON.stringify( this.state, null, '  ' ) + "\n";
      /*
-     json = "delta: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
      json += "db.details: " + JSON.stringify( this.state.db_data.details, null, '  ' ) + "\n";
      json += "orig.details: " + JSON.stringify( this.state.db_orig_data.details, null, '  ' );
       */
@@ -491,6 +494,7 @@ export default class CompRecambiosProformas extends React.Component {
   }
 }
 
-CompRecambiosProformas.propTypes = {
+CompFullLayoutDB.propTypes = {
+  layout: PropTypes.string.isRequired
 };
 

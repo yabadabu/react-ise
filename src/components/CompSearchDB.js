@@ -31,7 +31,7 @@ export default class CompSearchDB extends React.Component {
     //console.log( new_state );
     this.setState(new_state);
 
-    if( new_value.length >= this.props.data.search.fuzzy.min_num_chars ) 
+    if( new_value.length >= this.props.layout.search.fuzzy.min_num_chars ) 
       this.requestDataToDB();
   }
 
@@ -40,8 +40,8 @@ export default class CompSearchDB extends React.Component {
     //console.log( "requestDataToDB" );
     //console.log( this.state );
 
-    var layout = this.props.data;
-    var fields_defs = layout.search.fuzzy.fields;
+    const layout = this.props.layout;
+    const fields_defs = layout.search.fuzzy.fields;
     var fields = [];
     var filters = [];
     for( var idx in fields_defs ) {
@@ -79,7 +79,7 @@ export default class CompSearchDB extends React.Component {
   }  
 
   onClickRecent() {
-    var layout = this.props.data;
+    var layout = this.props.layout;
 
     var fields_defs = layout.search.fuzzy.fields;
     var fields = [];
@@ -102,8 +102,8 @@ export default class CompSearchDB extends React.Component {
 
   // -----------------------------------------------
   renderSearchForm() {
-    const p = this.props.data;
-    const sf = p.search.fuzzy;
+    const layout = this.props.layout;
+    const sf = layout.search.fuzzy;
 
     var key = 1000;
     var entries = [];
@@ -111,12 +111,12 @@ export default class CompSearchDB extends React.Component {
       key++;
       var fld_name = search_fld.field;
       var fld_style = search_fld.style;
-      var idx = _.findIndex( p.fields, (obj)=>{ return obj.field == fld_name; });
+      var idx = _.findIndex( layout.fields, (obj)=>{ return obj.field == fld_name; });
       if( idx == -1 ) {
         entries.push( <div key={key}>"Field {fld_name} is not defined in the layout"</div>);
         return;
       }
-      var f = p.fields[ idx ];
+      var f = layout.fields[ idx ];
       entries.push (
         <TextField 
           key={key}
@@ -129,7 +129,7 @@ export default class CompSearchDB extends React.Component {
     });
 
     var recent_button;
-    if( this.props.data.search.recent ) {
+    if( this.props.layout.search.recent ) {
       recent_button = (<RaisedButton label="Recientes" onClick={this.onClickRecent.bind(this)}/>);
     }
 
@@ -148,7 +148,7 @@ export default class CompSearchDB extends React.Component {
   renderColHeaders() {
     // Add the table format, we already have the rows contents
     var col_headers=[];
-    _.each(_.map( this.props.data.search.fuzzy.fields, "field" ), (f)=>{
+    _.each(_.map( this.props.layout.search.fuzzy.fields, "field" ), (f)=>{
       col_headers.push( <th key={f}>{f}</th> );
     });
     return (<tr key="col_headers">{col_headers}</tr>);
@@ -158,7 +158,7 @@ export default class CompSearchDB extends React.Component {
     var data_results;
     var key = 0;
 
-    var key_field = this.props.data.key_field;
+    var key_field = this.props.layout.key_field;
     if( Array.isArray( this.state.searchResults ) ) {
       data_results = this.state.searchResults.map( (row) => {
         key++;
@@ -217,7 +217,7 @@ export default class CompSearchDB extends React.Component {
 
 // --------------------------------------------------------------------
 CompSearchDB.propTypes = {
-  data: PropTypes.object.isRequired,
+  layout: PropTypes.object.isRequired,
   search_state: PropTypes.object,
   onClickNew: PropTypes.func,
   onClickSearchResult: PropTypes.func.isRequired
