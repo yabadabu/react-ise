@@ -10,17 +10,22 @@ const all_layouts = {
     title: "Recambios - Proformas",
     table: "[Recambios - Proformas]",
     key_field: 'IDProforma',
+    ChangeDate: true,           // Update queries add the ChangeDate = now()
     search: {
       fuzzy: {
         fields: [
           { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'" },
-          { field:"Empresa", style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'" }
+          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'" }
+          //{ field:"ChangeDate", style:{width:"10%"}, filter:"now() - ChangeDate < %__FIELD__%" }
         ],
         title: 'Número de la Proforma',
         min_num_chars: 3      // to fire the trigger
       },
       exact: { 
         filter: "IDProforma = '__FIELD__'" 
+      },
+      recent: {
+        filter: "now() - ChangeDate < 5 ORDER BY ChangeDate DESC"      // 5 days
       }
     },
     fields: [
@@ -30,9 +35,10 @@ const all_layouts = {
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
       { type:"separator"} ,
       { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
+      //{ field:"ChangeDate", type:"date", hint:"Fecha de Modificación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
       { field:"Calle", type:"text", style:{ width:"30%" } },
       { field:"Poblacion", type:"text", style:{ width:"30%" } },
-      { field:"CP", type:"text", hint:"CP", style:{ width:"10%" } },
+      { field:"CP", type:"text", hint:"CP", style:{ width:"70px" } },
       { field:"IDProvincia", type:"lut", lut:"Provincias.ID", title:"Provincia", hint:"Provincia", style:{ width:"15%" } },
       { type:"separator"},
       { field:"Notas", type:"text", multiLine:true, hint:"Notas adicionales", fullWidth:true, can_be_null:true },
@@ -64,8 +70,10 @@ const all_layouts = {
                         , column_style:{width:"120px"}
        },
       { field:"SubTotal", type:"computed", className:"currency"
-                        , formula:(row)=>{return as_euros(row.Cantidad * row.EurosUnidad)}},
-      { field:"Tipo", type:"number", default_value:0 },
+                        , formula:(row)=>{return as_euros(row.Cantidad * row.EurosUnidad);}},
+      { field:"Tipo", type:"select", lut:"Proformas.Detail.Tipo", default_value:0
+                        , column_style:{width:"60px"}
+                        },
       { field:"Delete", type:"action", title:"Borrar" }
      // { field:"Nota", type:"text" }
     ],

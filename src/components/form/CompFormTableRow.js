@@ -6,15 +6,37 @@ import CompFormAutoComplete from './CompFormAutoComplete.js';
 import db_combo_selects from '../../store/db_combo_selects';
 import CompFormDataList from './CompFormDataList.js';
 import ActionDelete from 'material-ui/lib/svg-icons/action/delete';
+import CompFormSelect from './CompFormSelect.js';
 
 // -----------------------------------------------------------------
 export default class CompFormTableRow extends React.Component {
 
-  onAutoCompleteChanges( new_value ) {
+  onAutoCompleteChanges( f, unique_id, row_idx, new_value ) {
+    /*
     console.log( "RowAutoComplete", new_value );
-    //props.onChange.bind(this, f, unique_id, row_idx)}
+    console.log( "field", f );
+    console.log( "unique_id", unique_id );
+    console.log( "row_idx", row_idx );
+    */
+    var fake_event = { target: { value: new_value }};
+    this.props.onChange(f, unique_id, row_idx, fake_event);
   }
 
+  onSelectChanges( f, unique_id, row_idx      // These are sent by our binding call 
+                 , event, index, new_value    // These are sent by the select component
+                 ) {
+    /*
+    console.log( "onSelectChanges" );
+    console.log( event, index, new_value);
+    console.log( "field", f );
+    console.log( "unique_id", unique_id );
+    console.log( "row_idx", row_idx );
+    */
+    var fake_event = { target: { value: new_value }};
+    this.props.onChange(f, unique_id, row_idx, fake_event);
+  }
+
+  // -----------------------------------------------------------------
   render() {
 
     //console.log( this.props.layout );
@@ -41,6 +63,7 @@ export default class CompFormTableRow extends React.Component {
       } 
 
       // Show the text associated to an id of a lut. Not editable, just the name
+      // For example the name of a reference code
       // of the reference
       else if( f.type === "lut_text" ) {
         const lut = db_combo_selects.luts[ f.lut ];
@@ -63,12 +86,22 @@ export default class CompFormTableRow extends React.Component {
 
       // Show the Name, and store the ID in the field. Provincias for example
       else if( f.type === "lut" ) {
-        var str_value = value ? value.toString : null;
+        let str_value = (value != undefined) ? value.toString() : null;
         value = (<CompFormAutoComplete 
                     field={f} 
                     value={str_value} 
-                    onChange={this.onAutoCompleteChanges.bind(this)}
+                    style={{width:"auto"}}
+                    onChange={this.onAutoCompleteChanges.bind(this,f,unique_id,row_idx)}
                     />);
+      }
+
+      // Show the Name, and store the ID. Picking just one of the available choices No input text
+      else if( f.type === "select" ) {
+        let str_value = (value != undefined) ? value.toString() : null;
+        value = (<CompFormSelect 
+                    value={str_value} 
+                    field={f} 
+                    onChange={this.onSelectChanges.bind(this,f,unique_id,row_idx)}/>);
       }
       
       else if( f.type === "computed" ) {

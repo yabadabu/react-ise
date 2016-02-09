@@ -92,10 +92,12 @@ function genUpdateSQL( table, fields, filter ) {
       continue;
     if( value == null )
       changes.push( f + " = null " );
+    else if( value == 'now()' && f === "ChangeDate")
+      changes.push( f + " = now() " );
     else
       changes.push( f + " = " + quoted( value ) );
   }
-  sql = "UPDATE " + table + " SET " + changes.join(",") + " WHERE " + filter;
+  sql = "UPDATE " + table + " SET " + changes.join(", ") + " WHERE " + filter;
   return sql;
 }
 

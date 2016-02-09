@@ -9,8 +9,10 @@
   - Popup to confirm
 - Add methods .getField to each layout
 - Dialogo para buscar un codigo de proforma nuevo
-- Added changeDate to proformas. Update it!, use it on 'Recientes'
+- Renombrar el recambios a algo mas generico
 
++ Added changeDate to proformas. Update it!, use it on 'Recientes'
++ Tipo de detalle
 + Notify invalid values in the form
 + Auto completed values, like total = €/unidad * Cantidad.
 + Table row align headers with data fields

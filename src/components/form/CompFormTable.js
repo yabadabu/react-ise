@@ -17,7 +17,7 @@ const CompFormTable = (props) => {
   // Collect information about which row/field has changed, and sent it back
   var handleChanges = ( field, row_id, row_idx, e ) => {
     /*
-    console.log( "Table: handleChanges ");
+    console.log( "----Table: handleChanges ");
     console.log( field );
     console.log( row_id );
     console.log( e.target.value );

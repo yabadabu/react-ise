@@ -48,7 +48,8 @@ table.search_results tr:nth-child(odd) {
 .currency {
   text-align:right
 }
-.currency::after { content: " €" }
+// Added a non-breaking space
+.currency::after { content: "\a0€" }
 
 div.main_section {
   zIndex: 0;

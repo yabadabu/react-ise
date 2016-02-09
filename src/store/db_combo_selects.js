@@ -11,6 +11,19 @@ var all_combos = {
   executed: false,
   luts: {},
 
+  createLut( lut_id, results ) {
+    let lut = { id2name:{}, name2id:{}};
+    _.each( results, (v)=>{
+      if( v.name ) {
+        lut.id2name[ v.id ] = v.name;
+        lut.name2id[ v.name ] = v.id;
+      }
+    });
+    lut.names = _.values( lut.id2name );
+    lut.ids   = _.keys( lut.id2name );
+    this.luts[ lut_id ] = lut;    
+  },
+
   queryData() {
 
     _.each( all_combo_sqls, (v,k)=>{
@@ -18,20 +31,17 @@ var all_combos = {
 
       dbConn.DBRunSQL( v, (results)=>{
         //console.log( "All combos recv for " + k + " " + v )
-
-        var lut = { id2name:{}, name2id:{}};
-        _.each( results, (v)=>{
-          if( v.name ) {
-            lut.id2name[ v.id ] = v.name;
-            lut.name2id[ v.name ] = v.id;
-          }
-        });
-        lut.names = _.values( lut.id2name );
-        lut.ids   = _.keys( lut.id2name );
-
-        this.luts[ k ] = lut;
+        this.createLut( k, results );
       });
     });
+
+    // Hard coded values
+    this.createLut( 'Proformas.Detail.Tipo', [
+        {id:0, name:'NORMAL'}
+      , {id:1, name:'SIN CARGO'}
+      , {id:2, name:'EN GARANTIA'}
+      , {id:3, name:'PRECIO ESPECIAL'}
+      ]);
   }
 };
 

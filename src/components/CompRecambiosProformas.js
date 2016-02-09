@@ -83,7 +83,7 @@ export default class CompRecambiosProformas extends React.Component {
     , msg_text: "blah blah"
     , modal_dlg_open: false
     , search_state: null
-    , trace: false
+    , trace: 0
     };
   }
 
@@ -102,7 +102,7 @@ export default class CompRecambiosProformas extends React.Component {
 
   // e is the unique id of the selected row in the comp search results
   onClickSearchResult( e, search_state ) {
-    console.log( "onClickSearchResult" );
+    //console.log( "onClickSearchResult" );
     this.setState({db_id:e});
 
     // Prepare the main query and the subqueries
@@ -272,12 +272,11 @@ export default class CompRecambiosProformas extends React.Component {
             } else {
 
               if( Object.keys( sub_changes ).length ) {
-                console.log( sub_changes );
+                //console.log( sub_changes );
                 var ext_id = this.state.db_data[k][idx][ext_key_field];
                 var filter = ext_layout.key_field + "="+ ext_id;
-                console.log( filter );
+                //console.log( filter );
                 tasks.push( (callback)=>{
-                  console.log( "Fileter is ", filter );
                   if( sub_changes._deleted ) {
                     dbConn.DBDelete( ext_layout.table 
                                    , filter
@@ -301,6 +300,10 @@ export default class CompRecambiosProformas extends React.Component {
       });
 
       if( main_required ) {
+
+        if( layout.ChangeDate )
+          main_changes[ 'ChangeDate' ] = "now()";
+
         delete changes[ layout.key_field ];
         tasks.push( (cb)=>{ 
           console.log( "Updating main table");
@@ -351,7 +354,10 @@ export default class CompRecambiosProformas extends React.Component {
   }
 
   onClickDevOptions() {
-    this.setState( {trace:!this.state.trace });
+    let new_trace = this.state.trace + 1;
+    if( new_trace > 2 )
+      new_trace = 0;
+    this.setState( {trace:new_trace} );
   }
 
   // --------------------------------------------------------------
@@ -470,7 +476,9 @@ export default class CompRecambiosProformas extends React.Component {
     var form = this.renderForm();
     var json = this.state.trace ? JSON.stringify( this.state, null, '  ' ) : "";
 
-    if( this.state.trace ) {
+    if( this.state.trace == 1 ) {
+     json = "State: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
+    } else if( this.state.trace == 2 ) {
      json = "State: " + JSON.stringify( this.state, null, '  ' ) + "\n";
      /*
      json = "delta: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";

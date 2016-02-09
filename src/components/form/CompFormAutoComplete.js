@@ -19,11 +19,13 @@ export default class CompFormAutoComplete extends React.Component {
   onNewRequest(e) {
     var lut = db_combo_selects.luts[ this.props.field.lut ];
     const value = lut.name2id[ e ];
-    if( value ) {
+    if( value == undefined ) {
+      this.setState({errorText:"Value " + e + " is not valid"});
+    } else if( value === "" || value == null ) {
+      this.setState({errorText:"Value required"});
+    } else {
       this.props.onChange( value );
       this.setState({errorText:null});
-    } else {
-      this.setState({errorText:"Value " + e + " is not valid"});
     }
   }
 

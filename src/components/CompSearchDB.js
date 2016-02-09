@@ -78,6 +78,28 @@ export default class CompSearchDB extends React.Component {
     this.props.onClickSearchResult( id, this.state, null );
   }  
 
+  onClickRecent() {
+    var layout = this.props.data;
+
+    var fields_defs = layout.search.fuzzy.fields;
+    var fields = [];
+    for( var idx in fields_defs ) {
+      var f = fields_defs[idx];
+      fields.push( f.field );
+    }
+
+    console.log( "Sending recent sql", layout );
+
+    // Do the fuzzy query and get the results back to me
+    dbConn.DBSelect( layout.table
+                   , fields
+                   , layout.search.recent.filter
+                   , (data) => {
+      this.setState({searchResults: data});
+    });  
+
+  }
+
   // -----------------------------------------------
   renderSearchForm() {
     const p = this.props.data;
@@ -106,10 +128,15 @@ export default class CompSearchDB extends React.Component {
           />);
     });
 
+    var recent_button;
+    if( this.props.data.search.recent ) {
+      recent_button = (<RaisedButton label="Recientes" onClick={this.onClickRecent.bind(this)}/>);
+    }
+
     const buttons_group_style = {float:"right"};
     entries.push( 
     <CardActions key={"buttons"} style={buttons_group_style}>
-      <RaisedButton label="Recientes"/>
+      {recent_button}
       <RaisedButton label="Nuevo" onClick={this.props.onClickNew}/>
     </CardActions>
     );
