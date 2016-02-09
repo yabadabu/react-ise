@@ -197,7 +197,10 @@ export default class CompFullLayoutDB extends React.Component {
   // --------------------------------------------------------------
   onClickUndo( e, dummy  ) {
     console.log( "Restoring...");
-    this.validateData({db_data:this.state.db_orig_data}, true);
+    if( this.state.db_creating_new )
+      this.onClickSearchAgain();
+    else
+      this.validateData({db_data:this.state.db_orig_data}, true);
   }
 
   // --------------------------------------------------------------
@@ -407,8 +410,8 @@ export default class CompFullLayoutDB extends React.Component {
         <IconButton tooltip="Buscar de nuevo" onClick={this.onClickSearchAgain.bind(this)}><ActionSearch/></IconButton>
         <IconButton disabled={changed || is_new} tooltip="Nuevo Registro" onClick={this.onClickNew.bind(this)}><ActionNew/></IconButton>
         <IconButton disabled={!changed && !is_new} tooltip="Guardar Cambios" onClick={this.onClickSave.bind(this)}><ActionSave/></IconButton>
-        <IconButton disabled={!changed} tooltip="Deshacer Cambios" onClick={this.onClickUndo.bind(this)}><ActionUndo/></IconButton>
-        <IconButton disabled={changed} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
+        <IconButton disabled={!changed && !is_new} tooltip="Deshacer Cambios" onClick={this.onClickUndo.bind(this)}><ActionUndo/></IconButton>
+        <IconButton disabled={changed || is_new} tooltip="Borrar Registro" onClick={this.onClickDelete.bind(this)}><ActionDelete/></IconButton>
       </CardActions>);
   }
 
