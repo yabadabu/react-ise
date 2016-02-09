@@ -11,7 +11,7 @@ export default class CompFormSelect extends React.Component {
     const props = this.props;
     const f     = props.field;
     const lut   = db_combo_selects.luts[ f.lut ];
-    const items = _.map( lut.id2name, (v,k)=>{ return (<MenuItem value={k} primaryText={v}/>); });
+    const items = _.map( lut.id2name, (v,k)=>{ return (<MenuItem key={k} value={k} primaryText={v}/>); });
 
     return (
       <div>

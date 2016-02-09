@@ -12,7 +12,7 @@ export default class CompFormDataList extends React.Component {
 
     const lut = db_combo_selects.luts[ this.props.lut ];
     var options = _.map(lut.id2name,(v,k)=>{
-      return (<option value={k}>{v}</option>);
+      return (<option key={k} value={k}>{v}</option>);
     });
     return (
       <datalist id={this.props.lut}>
