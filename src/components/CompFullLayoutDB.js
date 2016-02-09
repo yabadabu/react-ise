@@ -204,6 +204,19 @@ export default class CompFullLayoutDB extends React.Component {
   }
 
   // --------------------------------------------------------------
+  deleteRecord( ) {
+    const layout = this.state.layout;
+    var filter = layout.key_field + "='"+ this.state.db_id + "'";
+    console.log( "Deleting register ... " + filter);
+    dbConn.DBDelete( layout.table
+                   , filter
+                   , ()=>{ 
+      this.setState( {db_data:{}} ); // invalidates current data, so we can't return after deleting it
+      this.onClickSearchAgain(); 
+    });
+  }
+
+  // --------------------------------------------------------------
   onClickSave( e, dummy ) {
     if( !this.state.db_changed_rec && !this.state.db_creating_new )
       return;
@@ -228,13 +241,6 @@ export default class CompFullLayoutDB extends React.Component {
                      , changes
                      , handler );
 
-    } else if( changes._deleted ) {
-      var filter = layout.key_field + "='"+ this.state.db_id + "'";
-      console.log( "Deleting register ... " + filter);
-      dbConn.DBDelete( layout.table
-                     , filter
-                     , handler );
-      this.onClickSearchAgain();
     } else {
       // Not allowing changes in the key field
       var main_required = false;
@@ -442,9 +448,7 @@ export default class CompFullLayoutDB extends React.Component {
     };
     var handler_yes = ()=>{
       this.setState({modal_dlg_open: false});
-      var new_db_data = this.state.db_data;
-      new_db_data._deleted = true;
-      this.validateData( {db_data:new_db_data} );
+      this.deleteRecord();
     };
     var actions = (
       <CardActions >

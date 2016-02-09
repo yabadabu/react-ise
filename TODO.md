@@ -1,6 +1,3 @@
-- Return to search results after removing a record
-  - delete search results or the deleted record
-  - disable delete button while adding new record
 - Get quoted/non quoted unique id filter queries automatically
 - Move update/select to another place => layout?
 - Dialogo para buscar una empresa y asociar el codigo
@@ -9,8 +6,11 @@
   - Popup to confirm
 - Add methods .getField to each layout
 - Dialogo para buscar un codigo de proforma nuevo
-- Renombrar el recambios a algo mas generico
 
++ Return to search results after removing a record
+  + delete search results or the deleted record
+  + disable delete button while adding new record
++ Renombrar el recambios a algo mas generico
 + Added changeDate to proformas. Update it!, use it on 'Recientes'
 + Tipo de detalle
 + Notify invalid values in the form
