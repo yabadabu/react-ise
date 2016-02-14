@@ -46,8 +46,8 @@ export default class CompComputeNextIDFromDB extends React.Component {
     var keyfield = "IDProforma";
     var table = "[Recambios - Proformas]";
     var postID = "-N";
-    var TheYear = '16'
-    var TheNumber = "0001"
+    var TheYear = '16';
+    var TheNumber = "0001";
     
     // Do the fuzzy query and get the results back to me
     dbConn.DBSelect( table
