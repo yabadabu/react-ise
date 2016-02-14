@@ -113,13 +113,13 @@ export default class CompFullLayoutDB extends React.Component {
 
     tasks.push( (callback)=>{
       // Main query
-      console.log( "Retrieving main data for key " + e );
+      //console.log( "Retrieving main data for key " + e );
       var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, e );
       dbConn.DBSelect( layout.table
                      , ["*"]
                      , resolved_filter
                      , (data) => { 
-        console.log( "Main query recv");
+        //console.log( "Main query recv");
         //console.log( data );
         //db_all_results = Object.assign({},db_all_results,data[0]); 
         db_all_results = data[0]; 

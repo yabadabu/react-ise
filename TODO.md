@@ -1,5 +1,5 @@
-- Remove original old .js
 - Warning if leaving while we have pending changes
+- Precio de venta de los detalles tiene que salir por defecto de una tabla
 
 - Get quoted/non quoted unique id filter queries automatically
 - Move update/select to another place => layout?
@@ -8,6 +8,7 @@
   - Popup to confirm
 - Add methods .getField to each layout
 
++ Remove original old .js
 + focus on new subdetail
 + Removed fields from search-only dialogs
 + Control focus on show/new forms
