@@ -127,28 +127,18 @@ export default class CompSearchDB extends React.Component {
   // -----------------------------------------------
   renderSearchForm() {
     const layout = this.props.layout;
-    const sf = layout.search.fuzzy;
 
     var key = 1000;
     var entries = [];
-    _.map( sf.fields, ( search_fld ) => {
-      key++;
-      var fld_name = search_fld.field;
-      var fld_style = search_fld.style;
-      var idx = _.findIndex( layout.fields, (obj)=>{ return obj.field == fld_name; });
-      if( idx == -1 ) {
-        entries.push( <div key={key}>Field {fld_name} is not defined in the layout</div>);
-        return;
-      }
-      var f = layout.fields[ idx ];
+    _.map( layout.search.fuzzy.fields, ( f ) => {
       entries.push (
         <TextField 
-          key={key}
+          key={f.field}
           hintText={f.hint} 
           floatingLabelText={f.hint}
           value={this.state.searchTerms[f.field]}
-          style={fld_style}
-          onChange={this.onChangeSearchFld.bind(this,search_fld)}
+          style={f.style}
+          onChange={this.onChangeSearchFld.bind(this,f)}
           ref={f.field}
           />);
     });

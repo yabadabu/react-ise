@@ -5,6 +5,7 @@
   - Popup to confirm
 - Add methods .getField to each layout
 
++ Removed fields from search-only dialogs
 + Control focus on show/new forms
 + Control focus on dialog popup´s and search dialogs
 + Dialogo para buscar un codigo de proforma nuevo

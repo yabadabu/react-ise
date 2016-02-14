@@ -14,9 +14,8 @@ const all_layouts = {
     search: {
       fuzzy: {
         fields: [
-          { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'", min_num_chars:1 },
-          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3, focus_on_mount:true }
-          //{ field:"ChangeDate", style:{width:"10%"}, filter:"now() - ChangeDate < %__FIELD__%" }
+          { field:"IDProforma", style:{width:"10%"}, hint:"ID Proforma", filter:"IDProforma like '%__FIELD__%'", min_num_chars:1 },
+          { field:"Empresa",    style:{width:"60%"}, hint:"Empresa",     filter:"Empresa like '%__FIELD__%'", min_num_chars:3, focus_on_mount:true }
         ],
         title: 'Número de la Proforma'
       },
@@ -75,19 +74,24 @@ const all_layouts = {
     search: {
       fuzzy: {
         fields: [
-          { field:"[Número Cliente]", style:{width:"10%"}, filter:"[Número Cliente] like '%__FIELD__%'", min_num_chars:1 },
-          { field:"Empresa", focus_on_mount:true,   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
+          { field:"[Número Cliente]", style:{width:"10%"}
+                                    , filter:"[Número Cliente] like '%__FIELD__%'"
+                                    , min_num_chars:1 
+                                    , hint: "IDCliente"
+                                    },
+          { field:"Empresa", focus_on_mount:true
+                           , style:{width:"80%"}
+                           , filter:"Empresa like '%__FIELD__%'"
+                           , hint:"Empresa"
+                           , min_num_chars:3 
+                         }
         ]
       },
       exact: { 
         filter: "[Número Cliente] = __FIELD__" 
       },
       return_exact_query: true      // Return the full row when clicking a row
-    },
-    fields: [
-      { field:"[Número Cliente]", type:"text", hint:"# Cliente", read_only:true, style:{ width:"10%"} },
-      { field:"Empresa", type:"text", style:{ wdith:"80%" } }
-    ]
+    }
   },
 
   proforma_details: {
