@@ -2,6 +2,9 @@ import React, {PropTypes} from 'react';
 import _ from 'lodash';
 import TextField from 'material-ui/lib/text-field';
 import ActionSearch from 'material-ui/lib/svg-icons/action/home';
+import ActionFindInPage from 'material-ui/lib/svg-icons/action/find-in-page';
+import ActionInput from 'material-ui/lib/svg-icons/action/trending-up';
+
 import RaisedButton from 'material-ui/lib/raised-button';
 
 import CompFormText from './form/CompFormText.js';
@@ -9,6 +12,10 @@ import CompFormDate from './form/CompFormDate.js';
 import CompFormAutoComplete from './form/CompFormAutoComplete.js';
 import CompFormTable from './form/CompFormTable.js';
 import CompFormSelect from './form/CompFormSelect.js';
+import CompSearchDB from './CompSearchDB.js';
+ 
+import Dialog from 'material-ui/lib/dialog';
+import CardActions from 'material-ui/lib/card/card-actions';
 
 import * as layouts from '../store/db_layouts.js';
 
@@ -18,6 +25,15 @@ import * as layouts from '../store/db_layouts.js';
 // -------------------------------------------------------------
 export default class CompEditForm extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      modal_dlg_open: false
+    , modal_dlg_field: null   // Which ctrl triggered the open dialog action
+    };
+  }
+
+  // -------------------------------------------------------------
   handleHandle( field, new_value ) {
     var changed = {};
     changed[field.field] = new_value;
@@ -87,6 +103,60 @@ export default class CompEditForm extends React.Component {
   }
 
   // ---------------------------------------------------------------- 
+  handleOpenDlgLayout( f ) {
+    this.setState({modal_dlg_open:true, modal_dlg_field:f});
+  }
+
+  // Cancelling the dialog
+  handleDlgClick( f ) {
+    this.setState({modal_dlg_open:false});
+  }
+
+  handleDlgChooseFromDB(f,row) {
+    // Do a bulk update of all the fields at f.update_fields
+    var changed = {};
+    _.each( f.update_fields, (v,k)=>{
+      //console.log( "Update ", v, " to ", k, row[k] );
+      changed[v] = row[k];
+    });
+    //console.log( "Dlg closes and updates: ", changed, row, f.update_fields );
+    this.props.onChange( Object.assign( {}, this.props.data, changed));
+    this.setState({modal_dlg_open:false});
+  }
+
+  // ---------------------------------------------------------------- 
+  renderModalDialog() {
+    const f = this.state.modal_dlg_field;
+    if( !f )
+      return;
+    const layout = layouts.get( f.layout );
+
+    var actions = (
+      <CardActions >
+      <RaisedButton label="Cancelar" onClick={this.handleDlgClick.bind(this)}/>
+      </CardActions>);
+
+    const title = layout ? layout.title : "";
+    return (
+      <Dialog modal
+        open={this.state.modal_dlg_open}
+        title={title}
+        actions={actions}
+        autoDetectWindowHeight={false}
+        autoScrollBodyContent
+        >
+        <CompEditForm 
+          data={this.props.data} 
+          onClick={this.handleDlgClick.bind(this, f)}
+          onChooseFromDBSearch={this.handleDlgChooseFromDB.bind(this,f)}
+          layout={layout}
+          creating_new
+          />
+      </Dialog>
+    );
+  }
+
+  // ---------------------------------------------------------------- 
   render() {
     const cfg = this.props.layout;
     const obj = this.props.data;
@@ -123,6 +193,22 @@ export default class CompEditForm extends React.Component {
           <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
         );
 
+      } else if( f.type === "db_search" ) {
+        var layout_data = layouts.get( f.layout );    // search_cliente object
+        entries.push(
+          <CompSearchDB layout={layout_data} key={key} 
+                        no_action_buttons 
+                        no_headers 
+                        onClickSearchResult={this.props.onChooseFromDBSearch.bind(this)}/>
+        );
+
+      } else if( f.type === "modal_dialog" ) {
+        entries.push( (
+        <ActionInput
+            key={key}
+            onClick={this.handleOpenDlgLayout.bind( this, f )}
+          />) );
+
       } else if( f.type === "computed" ) {
         var computed_value = f.formula( obj );
         entries.push(
@@ -157,7 +243,9 @@ export default class CompEditForm extends React.Component {
     }
 
     key++;
-    return (<div key={key} className={this.props.layout.class_name}>{entries}</div>);
+
+    var dialog = this.renderModalDialog();
+    return (<div key={key} className={this.props.layout.class_name}>{entries}{dialog}</div>);
   }
 }
 
@@ -166,6 +254,7 @@ CompEditForm.propTypes = {
   layout:   PropTypes.object.isRequired,
   onClick:  PropTypes.func,
   onChange: PropTypes.func,
+  onChooseFromDBSearch: PropTypes.func,
   creating_new: PropTypes.bool, 
   has_changed: PropTypes.bool
 };

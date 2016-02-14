@@ -27,7 +27,7 @@ var all_combos = {
   queryData() {
 
     _.each( all_combo_sqls, (v,k)=>{
-      //console.log( "Sending query " + v );
+      console.log( "Sending query " + v );
 
       dbConn.DBRunSQL( v, (results)=>{
         //console.log( "All combos recv for " + k + " " + v )

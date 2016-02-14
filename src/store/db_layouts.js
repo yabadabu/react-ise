@@ -29,9 +29,21 @@ const all_layouts = {
       }
     },
     fields: [
-      //{ field:"Search", type:"action", hint:"Buscar una empresa" },
-      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"10%"} },
+      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"65px"} },
+      { field:"dlgIDProforma", type:"modal_dialog", layout:"dlg_id_proforma" },
+      { field:"IDCliente", type:"text", read_only:true, style:{ display:"none"} },
       { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"40%"} },
+      { field:"dlgIDEmpresa", type:"modal_dialog", layout:"dlg_id_cliente"
+             , update_fields:{
+                // DB exact search table <=> this table
+                "Número cliente":"IDCliente"
+              , "Empresa":"Empresa"
+              , "NIF":"NIF"
+              , "CP":"CP"
+              , "Calle":"Calle"
+              , "Poblacion":"Poblacion"
+              }
+             },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
       { type:"separator"} ,
       { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
@@ -47,6 +59,44 @@ const all_layouts = {
                        }
     ]
   },
+
+  dlg_id_proforma: {
+    title: "Details",
+    fields: [
+      { field:"IDProforma", type:"text", hint:"# Proforma", style:{ width:"100%"} }
+    ]
+  },
+
+  // This is the dialog that popup. It contains a single field, which is in fact a search field + results table
+  // with it's own layout
+  dlg_id_cliente: {
+    title: "Buscar Cliente",
+    fields: [
+      { field:"SearchEmpresa", type:"db_search", layout:"search_cliente" }
+    ]
+  },
+  search_cliente: {
+    table: "[Clientes]",
+    key_field: 'Número Cliente',
+    search: {
+      fuzzy: {
+        fields: [
+          { field:"[Número Cliente]", style:{width:"10%"}, filter:"[Número Cliente] like '%__FIELD__%'" },
+          { field:"Empresa",   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'" }
+        ],
+        min_num_chars: 3      // to fire the trigger
+      },
+      exact: { 
+        filter: "[Número Cliente] = __FIELD__" 
+      },
+      return_exact_query: true      // Return the full row when clicking a row
+    },
+    fields: [
+      { field:"[Número Cliente]", type:"text", hint:"# Cliente", read_only:true, style:{ width:"10%"} },
+      { field:"Empresa", type:"text", style:{ wdith:"80%" } }
+    ]
+  },
+
   proforma_details: {
     key_field: 'ID',
     title: "Details",

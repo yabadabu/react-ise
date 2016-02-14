@@ -73,9 +73,23 @@ export default class CompSearchDB extends React.Component {
 
   // When the user touches one of the results
   onTouchSearchRow(id) {
+    const layout = this.props.layout;
     //console.log( id );
-    // Notify we start searching for item with ID id
-    this.props.onClickSearchResult( id, this.state, null );
+    if( layout.search.return_exact_query ) {
+      // If they want the full row, just get the full row and call it back
+      var resolved_filter = layout.search.exact.filter.replace( /__FIELD__/, id );
+      //console.log( "resolved_filter", resolved_filter);
+      dbConn.DBSelect( layout.table
+                     , ["*"]
+                     , resolved_filter
+                     , (data) => { 
+                        this.props.onClickSearchResult( data[0], this.state, null );
+                     });
+    } else {
+      // Notify we start searching for item with ID id
+      this.props.onClickSearchResult( id, this.state, null );
+    }
+
   }  
 
   onClickRecent() {
@@ -88,7 +102,7 @@ export default class CompSearchDB extends React.Component {
       fields.push( f.field );
     }
 
-    console.log( "Sending recent sql", layout );
+    // console.log( "Sending recent sql", layout );
 
     // Do the fuzzy query and get the results back to me
     dbConn.DBSelect( layout.table
@@ -113,7 +127,7 @@ export default class CompSearchDB extends React.Component {
       var fld_style = search_fld.style;
       var idx = _.findIndex( layout.fields, (obj)=>{ return obj.field == fld_name; });
       if( idx == -1 ) {
-        entries.push( <div key={key}>"Field {fld_name} is not defined in the layout"</div>);
+        entries.push( <div key={key}>Field {fld_name} is not defined in the layout</div>);
         return;
       }
       var f = layout.fields[ idx ];
@@ -133,13 +147,15 @@ export default class CompSearchDB extends React.Component {
       recent_button = (<RaisedButton label="Recientes" onClick={this.onClickRecent.bind(this)}/>);
     }
 
-    const buttons_group_style = {float:"right"};
-    entries.push( 
-    <CardActions key={"buttons"} style={buttons_group_style}>
-      {recent_button}
-      <RaisedButton label="Nuevo" onClick={this.props.onClickNew}/>
-    </CardActions>
-    );
+    if( !this.props.no_action_buttons ) {
+      const buttons_group_style = {float:"right"};
+      entries.push( 
+      <CardActions key={"buttons"} style={buttons_group_style}>
+        {recent_button}
+        <RaisedButton label="Nuevo" onClick={this.props.onClickNew}/>
+      </CardActions>
+      );
+    }
 
     return (<div key="search_form">{entries}</div>);
   }
@@ -191,7 +207,8 @@ export default class CompSearchDB extends React.Component {
 
   // --------------------------------------------------------------------
   renderSearchResults() {
-    var headers = this.renderColHeaders();
+    var headers;
+    if( !this.props.no_headers ) headers = this.renderColHeaders();
     var body = this.renderSearchBodyResults();
     return (
       <table key="search_results" className="search_results">
@@ -219,6 +236,8 @@ export default class CompSearchDB extends React.Component {
 CompSearchDB.propTypes = {
   layout: PropTypes.object.isRequired,
   search_state: PropTypes.object,
+  no_headers: PropTypes.bool,
+  no_action_buttons: PropTypes.bool,
   onClickNew: PropTypes.func,
   onClickSearchResult: PropTypes.func.isRequired
 };
