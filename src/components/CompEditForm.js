@@ -35,41 +35,42 @@ export default class CompEditForm extends React.Component {
   }
 
   // -------------------------------------------------------------
-  handleHandle( field, new_value ) {
+  handleChange( field, new_value ) {
     var changed = {};
     changed[field.field] = new_value;
+    // add changed to this.props.data creating a new object which is 
+    // sent as 'changed' to the parent props handler
     this.props.onChange( Object.assign( {}, this.props.data, changed));
   }
 
   handleTextChange( field, e ) { 
-    this.handleHandle( field, e.target.value); 
+    this.handleChange( field, e.target.value); 
   }
   handleAutoCompleteChange( field, new_value ) { 
-    this.handleHandle( field, new_value); 
+    this.handleChange( field, new_value); 
   }
   handleSelectChange( field, event, index, new_value ) { 
-    this.handleHandle( field, new_value); 
     //console.log( field, event, index, new_value )
+    this.handleChange( field, new_value); 
   }
   handleDateChange( field, this_is_null, new_date ) {
-    this.handleHandle( field, layouts.asYYYYMMDD( new_date )); 
+    this.handleChange( field, layouts.asYYYYMMDD( new_date )); 
   }
   handleTableChange( main_field, external_field, external_id, external_idx, new_value ) {
     /*
     console.log( "at handleTableChange" );
     console.log( this );
-    console.log( main_field );
-    console.log( external_field );
-    console.log( external_id );
-    console.log( external_idx );
-    console.log( new_value );
+    console.log( main_field );        // details
+    console.log( external_field );    // REF
+    console.log( external_id );       // REF.value => 8
+    console.log( external_idx );      // Row index
+    console.log( new_value );         // new value as string/number/null
     console.log( this.props.data );
     */
     var new_data = this.props.data[main_field.field];
-    //new_data[ external_idx ] = _.clone( this.props.data[main_field.field][ external_idx ] );
     new_data[ external_idx ][ external_field.field ] = new_value;
     //console.log( new_data );
-    this.handleHandle( main_field, new_data); 
+    this.handleChange( main_field, new_data); 
   }
 
   handleTableClick( main_field, external_field, external_id, external_idx ) {
@@ -87,7 +88,7 @@ export default class CompEditForm extends React.Component {
     //rows.splice( external_idx, 1 );
     rows[ external_idx ]._deleted = true;
     //console.log( new_data );
-    this.handleHandle( main_field, rows); 
+    this.handleChange( main_field, rows); 
   }
 
   handleAddNewDetailOnTable( f ) {
@@ -100,7 +101,7 @@ export default class CompEditForm extends React.Component {
     var all_details = this.props.data[f.field];
     new_rec._is_new = true;
     all_details.push( new_rec );
-    this.handleHandle( f, all_details); 
+    this.handleChange( f, all_details); 
   }
 
   // ---------------------------------------------------------------- 
