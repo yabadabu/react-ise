@@ -10,9 +10,7 @@ import CompFullLayoutDB from '../components/CompFullLayoutDB';
 import AppBar from 'material-ui/lib/app-bar';
 import Paper from 'material-ui/lib/paper';
 
-import FuelSavingsApp from '../components/FuelSavingsApp';
 import * as FuelSavingsActions from '../actions/fuelSavingsActions';
-
 
 class AppMain extends React.Component {
 

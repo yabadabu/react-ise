@@ -20,7 +20,6 @@ import ActionNew from 'material-ui/lib/svg-icons/action/open-in-new';
 import ActionSave from 'material-ui/lib/svg-icons/content/save';
 import ActionUndo from 'material-ui/lib/svg-icons/content/undo';
 
-import CompSearchButton from './CompSearchButton';
 import CompEditForm from './CompEditForm';
 import RaisedButton from 'material-ui/lib/raised-button';
 import CardActions from 'material-ui/lib/card/card-actions';
