@@ -55,7 +55,7 @@ function getPropertiesOfAChangedFromB( a, b ) {
       diffs[k] = array_diff;
     } 
     else if( b[k] ) { 
-      if( ( typeof a[k] == undefined ) || b[k].toString() !== a[k].toString() ) {
+      if( ( typeof a[k] == undefined ) || (!b[k] || !a[k]) || ( b[k].toString() !== a[k].toString()) ) {
         diffs[k] = a[k];
       }
     }
