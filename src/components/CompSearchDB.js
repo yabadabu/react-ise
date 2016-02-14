@@ -22,16 +22,17 @@ export default class CompSearchDB extends React.Component {
   // When the search field changed and we have enough characters
   // then we start a search in the db
   onChangeSearchFld(field, e) {
+    var field_name = field.field;
     //console.log( "onChangeSearchFld" );
-    //console.log( field );
+    //console.log( field, field_name );
     //console.log( e );
     var new_value = e.target.value;
     var new_state = this.state;
-    new_state.searchTerms[field] = new_value;
+    new_state.searchTerms[field_name] = new_value;
     //console.log( new_state );
     this.setState(new_state);
 
-    if( new_value.length >= this.props.layout.search.fuzzy.min_num_chars ) 
+    if( new_value.length >= field.min_num_chars ) 
       this.requestDataToDB();
   }
 
@@ -138,7 +139,7 @@ export default class CompSearchDB extends React.Component {
           floatingLabelText={f.hint}
           value={this.state.searchTerms[f.field]}
           style={fld_style}
-          onChange={this.onChangeSearchFld.bind(this,f.field)}
+          onChange={this.onChangeSearchFld.bind(this,search_fld)}
           />);
     });
 

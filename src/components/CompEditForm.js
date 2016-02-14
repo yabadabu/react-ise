@@ -13,6 +13,7 @@ import CompFormAutoComplete from './form/CompFormAutoComplete.js';
 import CompFormTable from './form/CompFormTable.js';
 import CompFormSelect from './form/CompFormSelect.js';
 import CompSearchDB from './CompSearchDB.js';
+import CompComputeNextIDFromDB from './CompComputeNextIDFromDB.js';
  
 import Dialog from 'material-ui/lib/dialog';
 import CardActions from 'material-ui/lib/card/card-actions';
@@ -208,6 +209,9 @@ export default class CompEditForm extends React.Component {
             key={key}
             onClick={this.handleOpenDlgLayout.bind( this, f )}
           />) );
+
+      } else if( f.type === "db_query_and_update" ) {
+        entries.push( <CompComputeNextIDFromDB field={f} key={key} onDataFound={this.handleDlgChooseFromDB.bind(this, f)}/> );
 
       } else if( f.type === "computed" ) {
         var computed_value = f.formula( obj );

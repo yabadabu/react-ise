@@ -14,12 +14,11 @@ const all_layouts = {
     search: {
       fuzzy: {
         fields: [
-          { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'" },
-          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'" }
+          { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'", min_num_chars:1 },
+          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
           //{ field:"ChangeDate", style:{width:"10%"}, filter:"now() - ChangeDate < %__FIELD__%" }
         ],
-        title: 'Número de la Proforma',
-        min_num_chars: 3      // to fire the trigger
+        title: 'Número de la Proforma'
       },
       exact: { 
         filter: "IDProforma = '__FIELD__'" 
@@ -29,19 +28,20 @@ const all_layouts = {
       }
     },
     fields: [
-      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"65px"} },
-      { field:"dlgIDProforma", type:"modal_dialog", layout:"dlg_id_proforma" },
+      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"75px"} },
+      { field:"dlgIDProforma", type:"db_query_and_update"
+             , update_fields: { IDProforma:"IDProforma" } },
       { field:"IDCliente", type:"text", read_only:true, style:{ display:"none"} },
       { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"40%"} },
       { field:"dlgIDEmpresa", type:"modal_dialog", layout:"dlg_id_cliente"
              , update_fields:{
                 // DB exact search table <=> this table
                 "Número cliente":"IDCliente"
-              , "Empresa":"Empresa"
-              , "NIF":"NIF"
-              , "CP":"CP"
-              , "Calle":"Calle"
-              , "Poblacion":"Poblacion"
+              , Empresa:"Empresa"
+              , NIF:"NIF"
+              , CP:"CP"
+              , Calle:"Calle"
+              , Poblacion:"Poblacion"
               }
              },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
@@ -60,13 +60,6 @@ const all_layouts = {
     ]
   },
 
-  dlg_id_proforma: {
-    title: "Details",
-    fields: [
-      { field:"IDProforma", type:"text", hint:"# Proforma", style:{ width:"100%"} }
-    ]
-  },
-
   // This is the dialog that popup. It contains a single field, which is in fact a search field + results table
   // with it's own layout
   dlg_id_cliente: {
@@ -81,10 +74,9 @@ const all_layouts = {
     search: {
       fuzzy: {
         fields: [
-          { field:"[Número Cliente]", style:{width:"10%"}, filter:"[Número Cliente] like '%__FIELD__%'" },
-          { field:"Empresa",   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'" }
-        ],
-        min_num_chars: 3      // to fire the trigger
+          { field:"[Número Cliente]", style:{width:"10%"}, filter:"[Número Cliente] like '%__FIELD__%'", min_num_chars:1 },
+          { field:"Empresa",   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
+        ]
       },
       exact: { 
         filter: "[Número Cliente] = __FIELD__" 
@@ -204,6 +196,8 @@ export function getNewEmptyRegister( layout ) {
         data[f.field] = asYYYYMMDD( new Date() );
       else if( f.type == "array_table") 
         data[f.field] = [];
+      else if( f.multiLine ) 
+        data[f.field] = "";
       else if( f.type == "lut_text" || f.type =="action")
         return;
       else 
