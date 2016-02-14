@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
+import * as layouts from '../../store/db_layouts.js';
 
 import CompFormText from './CompFormText';
 import CompFormAutoComplete from './CompFormAutoComplete.js';
@@ -80,12 +81,29 @@ export default class CompFormTableRow extends React.Component {
       // Must show the id of a lut, but show the text close to it.
       // For example a REF which is a valid id but has the text close
       else if( f.type === "lut_id" ) {
-        const lut = db_combo_selects.luts[ f.lut ];
+        let handle_blur = (e)=>{
+          if( e && e.target && e.target.value && f.onBlur ) {
+            const new_value = e.target.value;
+            // Call the user defined handler, giving him the new_value, the full row values
+            // and a callback to change other fields of the same row
+            f.onBlur( new_value, values, ( field_name, field_value )=>{
+              console.log( "User wants to update ", field_name, " to ", field_value ); 
+              var f_to_update = layouts.getFieldByname( layout, field_name );
+              if( !f ) {
+                console.log( "Field " + field_name + " does not exist in the layout");
+                return;
+              }
+              var fake_e = { target:{ value: field_value }};
+              this.props.onChange(f_to_update,unique_id,row_idx,fake_e);
+            });
+          }
+        };
         value = (
           <input list={f.lut} 
                  value={value} 
                  type="text"
                  ref={f.field}
+                 onBlur={handle_blur}
                  onChange={this.props.onChange.bind(this,f,unique_id,row_idx)}>
           </input>
           );

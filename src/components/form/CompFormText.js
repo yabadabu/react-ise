@@ -15,7 +15,6 @@ export default class CompFormText extends React.Component {
     }
   }
 
-
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.value !== this.props.value;
   }
@@ -26,6 +25,7 @@ export default class CompFormText extends React.Component {
     const f     = props.field;
     const label = props.inside_table ? "" : (f.title ? f.title : f.field);
     const disabled = f.read_only && !props.creating_new;
+    let value = props.value;
     let style = f.style;
     let inputStyle = f.inputStyle;
     if( !inputStyle ) inputStyle = {};
@@ -33,6 +33,8 @@ export default class CompFormText extends React.Component {
     if( f.type === "number" || f.format === "currency") {
       inputStyle["textAlign"] = "right";
       style["width"] = null;
+      if( Number( value ) === value )
+        value = value.toLocaleString( );
     }
     var errorText = null;
     if( !f.can_be_null && props.value === null )
@@ -42,7 +44,7 @@ export default class CompFormText extends React.Component {
         className="form_input"
         hintText={f.hint}
         floatingLabelText={label}
-        value={props.value}
+        value={value}
         style={style}
         inputStyle={inputStyle}
         fullWidth={f.fullWidth}

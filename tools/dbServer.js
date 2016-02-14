@@ -69,8 +69,21 @@ function startWSServer( ) {
   });
 }
 
+// ----------------------------------------------------------
 function quoted( x ) {
   return "'" + x + "'";
+}
+
+function asSQLValue( value ) {
+  // nodejs does not seem to be properly run number.toLocaleString()
+  // The numbers... replace '.' for ',' 
+  if( Number( value ) === value ) {
+    var str_value = value.toString();
+    value = str_value.replace( '.', ',');
+  } else {
+    // Check there are no unescaped ' in the string
+  }
+  return quoted( value );
 }
 
 // ----------------------------------------------------------
@@ -94,8 +107,9 @@ function genUpdateSQL( table, fields, filter ) {
       changes.push( f + " = null " );
     else if( value == 'now()' && f === "ChangeDate")
       changes.push( f + " = now() " );
-    else
-      changes.push( f + " = " + quoted( value ) );
+    else {
+      changes.push( f + " = " + asSQLValue( value ) );
+    }
   }
   sql = "UPDATE " + table + " SET " + changes.join(", ") + " WHERE " + filter;
   return sql;
@@ -117,8 +131,9 @@ function genInsertSQL( table, fields ) {
     field_names.push( f );
     if( value == null )
       field_values.push( value );
-    else
-      field_values.push( quoted( value ) );
+    else {
+      field_values.push( asSQLValue( value ) );
+    }
   }
   sql = "INSERT INTO " + table + " (" + field_names.join(", ") + ") VALUES (" + field_values.join(", ") + ")";
   return sql;

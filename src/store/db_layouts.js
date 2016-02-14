@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import dbConn from '../store/db_connection.js';
 
 function as_euros(x) {
   return x ? (x.toFixed(2)) : "0";
@@ -105,7 +106,26 @@ const all_layouts = {
     },
     fields: [
       { field:"ID", type:"hidden", read_only:true },
-      { field:"REF", type:"lut_id", lut:"Recambios.REF", focus_on_mount:true, hint:"Referencia", column_style:{width:"60px"} },
+      { field:"REF", type:"lut_id"
+                   , lut:"Recambios.REF"
+                   , focus_on_mount:true
+                   , hint:"Referencia"
+                   , column_style:{width:"60px"}
+                   , onBlur:(new_value, row, updater)=>{
+                      if( new_value ) {
+                        console.log( "Searching new sale price for " + new_value );
+                        dbConn.DBLookUp( "EurosUnidad"
+                                       , "[Precios Venta Referencias]"
+                                       , "(FechaFinal Is Null) AND (REF='" + new_value + "')"
+                                       , ( data )=>{
+                                          console.log( "New price recv", data );
+                                          if( data ) {
+                                            updater( 'EurosUnidad', data );
+                                          }
+                                       });
+                      }
+                   } 
+                   },
       { field:"REF.Name", type:"lut_text", title:"Nombre"
                         , lut:"Recambios.REF", link:"REF", hint:"Referencia"
                         , column_style:{width:"300px"}

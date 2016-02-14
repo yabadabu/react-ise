@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+import _ from 'lodash';
 
 class DBConnection extends EventEmitter {
 
@@ -79,6 +80,12 @@ class DBConnection extends EventEmitter {
     this.next_id++;
     this.connection.send( JSON.stringify(arg) );
   }
+
+  // ---------------------------------------------------------------
+  DBLookUp( field, table, filter, callback ) {
+    var arg = {q:"select", fields:[field], table:table, filter:filter };
+    this.launch( arg, (data)=>{callback( _.values( data[0] )[0] );});
+  } 
 
   // ---------------------------------------------------------------
   DBSelect( table, fields, filter, callback ) {
