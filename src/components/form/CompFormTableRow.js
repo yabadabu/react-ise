@@ -11,6 +11,13 @@ import CompFormSelect from './CompFormSelect.js';
 // -----------------------------------------------------------------
 export default class CompFormTableRow extends React.Component {
 
+  componentDidMount() {
+    _.each( this.props.layout.fields, (f)=>{
+      if( f.focus_on_mount ) 
+        this.refs[ f.field ].focus();
+    });
+  }
+
   onAutoCompleteChanges( f, unique_id, row_idx, new_value ) {
     /*
     console.log( "RowAutoComplete", new_value );
@@ -21,7 +28,7 @@ export default class CompFormTableRow extends React.Component {
     var fake_event = { target: { value: new_value }};
     this.props.onChange(f, unique_id, row_idx, fake_event);
   }
-
+  
   onSelectChanges( f, unique_id, row_idx      // These are sent by our binding call 
                  , event, index, new_value    // These are sent by the select component
                  ) {
@@ -58,8 +65,7 @@ export default class CompFormTableRow extends React.Component {
                     field={f} 
                     value={value} 
                     inside_table 
-                    onChange={this.props.onChange.bind(this, f, unique_id, row_idx)}
-                  /> );
+                    onChange={this.props.onChange.bind(this, f, unique_id, row_idx)}/>);
       } 
 
       // Show the text associated to an id of a lut. Not editable, just the name
@@ -79,6 +85,7 @@ export default class CompFormTableRow extends React.Component {
           <input list={f.lut} 
                  value={value} 
                  type="text"
+                 ref={f.field}
                  onChange={this.props.onChange.bind(this,f,unique_id,row_idx)}>
           </input>
           );

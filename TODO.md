@@ -1,3 +1,6 @@
+- Remove original old .js
+- Warning if leaving while we have pending changes
+
 - Get quoted/non quoted unique id filter queries automatically
 - Move update/select to another place => layout?
 / Option to delete a sub record
@@ -5,6 +8,7 @@
   - Popup to confirm
 - Add methods .getField to each layout
 
++ focus on new subdetail
 + Removed fields from search-only dialogs
 + Control focus on show/new forms
 + Control focus on dialog popup´s and search dialogs

@@ -105,7 +105,7 @@ const all_layouts = {
     },
     fields: [
       { field:"ID", type:"hidden", read_only:true },
-      { field:"REF", type:"lut_id", lut:"Recambios.REF", hint:"Referencia", column_style:{width:"60px"} },
+      { field:"REF", type:"lut_id", lut:"Recambios.REF", focus_on_mount:true, hint:"Referencia", column_style:{width:"60px"} },
       { field:"REF.Name", type:"lut_text", title:"Nombre"
                         , lut:"Recambios.REF", link:"REF", hint:"Referencia"
                         , column_style:{width:"300px"}
