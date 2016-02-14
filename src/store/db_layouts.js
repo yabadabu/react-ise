@@ -42,6 +42,7 @@ const all_layouts = {
               , CP:"CP"
               , Calle:"Calle"
               , Poblacion:"Poblacion"
+              , IDProvincia:"IDProvincia"
               }
              },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
