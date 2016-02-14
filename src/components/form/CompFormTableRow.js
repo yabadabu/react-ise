@@ -104,6 +104,7 @@ export default class CompFormTableRow extends React.Component {
                  type="text"
                  ref={f.field}
                  onBlur={handle_blur}
+                 onChange={this.props.onChange.bind(this,f,unique_id,row_idx)}
                  >
           </input>
           );

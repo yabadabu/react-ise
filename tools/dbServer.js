@@ -74,10 +74,19 @@ function quoted( x ) {
   return "'" + x + "'";
 }
 
+function isNumber( x ) {
+  var nx = Number( x  );
+  if( x && !isNaN(nx) ) { 
+    if( nx.toString() == x )      // Must use ==, not ===
+      return true;
+  }
+  return false;
+}
+
 function asSQLValue( value ) {
   // nodejs does not seem to be properly run number.toLocaleString()
   // The numbers... replace '.' for ',' 
-  if( Number( value ) === value ) {
+  if( Number( value ) == value ) {
     var str_value = value.toString();
     value = str_value.replace( '.', ',');
   } else {

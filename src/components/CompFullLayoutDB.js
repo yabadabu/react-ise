@@ -183,6 +183,7 @@ export default class CompFullLayoutDB extends React.Component {
         var ref = this.state.db_orig_data;
         if( ns.db_orig_data )
           ref = ns.db_orig_data;
+        console.log( "Computing delta from db_orig");
         ns.db_delta = getPropertiesOfAChangedFromB( ns.db_data, ref );
         ns.db_changed_rec = ( Object.keys( ns.db_delta ).length != 0 );
       }

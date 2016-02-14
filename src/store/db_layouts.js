@@ -112,7 +112,7 @@ const all_layouts = {
                    , hint:"Referencia"
                    , column_style:{width:"60px"}
                    , onBlur:(new_value, row, updater)=>{
-                      if( new_value && new_value !== row['REF'] ) {
+                      if( new_value ) { //} && new_value !== row['REF'] ) {
                         console.log( "Searching new sale price for " + new_value );
                         dbConn.DBLookUp( "EurosUnidad"
                                        , "[Precios Venta Referencias]"
