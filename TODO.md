@@ -1,12 +1,14 @@
 - Get quoted/non quoted unique id filter queries automatically
 - Move update/select to another place => layout?
-- Dialogo para buscar una empresa y asociar el codigo
 / Option to delete a sub record
   + Delete the real db
   - Popup to confirm
 - Add methods .getField to each layout
-- Dialogo para buscar un codigo de proforma nuevo
 
++ Control focus on show/new forms
++ Control focus on dialog popup´s and search dialogs
++ Dialogo para buscar un codigo de proforma nuevo
++ Dialogo para buscar una empresa y asociar el codigo
 + Return to search results after removing a record
   + delete search results or the deleted record
   + disable delete button while adding new record

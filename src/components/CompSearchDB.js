@@ -19,6 +19,15 @@ export default class CompSearchDB extends React.Component {
     this.state = init_state;
   }
 
+  componentDidMount() {
+    // Check if any search field wants the focus.
+    // Requires 'ref={..} when instantiating the field'
+    _.each( this.props.layout.search.fuzzy.fields, (f)=>{
+      if( f.focus_on_mount ) 
+        this.refs[ f.field ].focus();
+    });
+  }
+
   // When the search field changed and we have enough characters
   // then we start a search in the db
   onChangeSearchFld(field, e) {
@@ -140,6 +149,7 @@ export default class CompSearchDB extends React.Component {
           value={this.state.searchTerms[f.field]}
           style={fld_style}
           onChange={this.onChangeSearchFld.bind(this,search_fld)}
+          ref={f.field}
           />);
     });
 

@@ -109,12 +109,13 @@ export default class CompEditForm extends React.Component {
   }
 
   // Cancelling the dialog
-  handleDlgClick( f ) {
+  handleCloseDlg() {
     this.setState({modal_dlg_open:false});
   }
 
   handleDlgChooseFromDB(f,row) {
-    // Do a bulk update of all the fields at f.update_fields
+    // Do a bulk update of all the fields at f.update_fields, wih the values
+    // taken from row
     var changed = {};
     _.each( f.update_fields, (v,k)=>{
       //console.log( "Update ", v, " to ", k, row[k] );
@@ -122,7 +123,7 @@ export default class CompEditForm extends React.Component {
     });
     //console.log( "Dlg closes and updates: ", changed, row, f.update_fields );
     this.props.onChange( Object.assign( {}, this.props.data, changed));
-    this.setState({modal_dlg_open:false});
+    this.handleCloseDlg();
   }
 
   // ---------------------------------------------------------------- 
@@ -134,7 +135,7 @@ export default class CompEditForm extends React.Component {
 
     var actions = (
       <CardActions >
-      <RaisedButton label="Cancelar" onClick={this.handleDlgClick.bind(this)}/>
+        <RaisedButton label="Cancelar" onClick={this.handleCloseDlg.bind(this)}/>
       </CardActions>);
 
     const title = layout ? layout.title : "";
@@ -148,7 +149,6 @@ export default class CompEditForm extends React.Component {
         >
         <CompEditForm 
           data={this.props.data} 
-          onClick={this.handleDlgClick.bind(this, f)}
           onChooseFromDBSearch={this.handleDlgChooseFromDB.bind(this,f)}
           layout={layout}
           creating_new

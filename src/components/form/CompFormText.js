@@ -1,9 +1,20 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 
 import TextField from 'material-ui/lib/text-field';
 
 // -----------------------------------------------------------------
 export default class CompFormText extends React.Component {
+
+  componentDidMount() {
+    // Check if any search field wants the focus.
+    // Requires 'ref={..} when instantiating the field'
+    var f = this.props.field;
+    if( f.focus_on_mount ) {
+      this.refs[ f.field ].focus();
+    }
+  }
+
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.value !== this.props.value;
@@ -40,6 +51,7 @@ export default class CompFormText extends React.Component {
         disabled={disabled}
         errorText={errorText}
         onChange={props.onChange}
+        ref={f.field}
         />
     );
   }

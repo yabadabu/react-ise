@@ -15,7 +15,7 @@ const all_layouts = {
       fuzzy: {
         fields: [
           { field:"IDProforma", style:{width:"10%"}, filter:"IDProforma like '%__FIELD__%'", min_num_chars:1 },
-          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
+          { field:"Empresa",    style:{width:"60%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3, focus_on_mount:true }
           //{ field:"ChangeDate", style:{width:"10%"}, filter:"now() - ChangeDate < %__FIELD__%" }
         ],
         title: 'Número de la Proforma'
@@ -28,7 +28,7 @@ const all_layouts = {
       }
     },
     fields: [
-      { field:"IDProforma", type:"text", hint:"# Proforma", read_only:true, style:{ width:"75px"} },
+      { field:"IDProforma", type:"text", hint:"# Proforma", focus_on_mount:true, read_only:true, style:{ width:"75px"} },
       { field:"dlgIDProforma", type:"db_query_and_update"
              , update_fields: { IDProforma:"IDProforma" } },
       { field:"IDCliente", type:"text", read_only:true, style:{ display:"none"} },
@@ -76,7 +76,7 @@ const all_layouts = {
       fuzzy: {
         fields: [
           { field:"[Número Cliente]", style:{width:"10%"}, filter:"[Número Cliente] like '%__FIELD__%'", min_num_chars:1 },
-          { field:"Empresa",   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
+          { field:"Empresa", focus_on_mount:true,   style:{width:"80%"}, filter:"Empresa like '%__FIELD__%'", min_num_chars:3 }
         ]
       },
       exact: { 
