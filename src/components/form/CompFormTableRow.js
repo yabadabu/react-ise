@@ -19,31 +19,6 @@ export default class CompFormTableRow extends React.Component {
     });
   }
 
-  onAutoCompleteChanges( f, unique_id, row_idx, new_value ) {
-    /*
-    console.log( "RowAutoComplete", new_value );
-    console.log( "field", f );
-    console.log( "unique_id", unique_id );
-    console.log( "row_idx", row_idx );
-    */
-    var fake_event = { target: { value: new_value }};
-    this.props.onChange(f, unique_id, row_idx, fake_event);
-  }
-  
-  onSelectChanges( f, unique_id, row_idx      // These are sent by our binding call 
-                 , event, index, new_value    // These are sent by the select component
-                 ) {
-    /*
-    console.log( "onSelectChanges" );
-    console.log( event, index, new_value);
-    console.log( "field", f );
-    console.log( "unique_id", unique_id );
-    console.log( "row_idx", row_idx );
-    */
-    var fake_event = { target: { value: new_value }};
-    this.props.onChange(f, unique_id, row_idx, fake_event);
-  }
-
   // -----------------------------------------------------------------
   render() {
 
@@ -66,7 +41,7 @@ export default class CompFormTableRow extends React.Component {
                     field={f} 
                     value={value} 
                     inside_table 
-                    onChange={this.props.onChange.bind(this, f, unique_id, row_idx)}/>);
+                    onChange={this.props.onChange.bind(this, f)}/>);
       } 
 
       // Show the text associated to an id of a lut. Not editable, just the name
@@ -94,7 +69,7 @@ export default class CompFormTableRow extends React.Component {
                 return;
               }
               var fake_e = { target:{ value: field_value }};
-              this.props.onChange(f_to_update,unique_id,row_idx,fake_e);
+              this.props.onChange(f_to_update,fake_e);
             });
           }
         };
@@ -104,7 +79,7 @@ export default class CompFormTableRow extends React.Component {
                  type="text"
                  ref={f.field}
                  onBlur={handle_blur}
-                 onChange={this.props.onChange.bind(this,f,unique_id,row_idx)}
+                 onChange={this.props.onChange.bind(this,f)}
                  >
           </input>
           );
@@ -117,7 +92,7 @@ export default class CompFormTableRow extends React.Component {
                     field={f} 
                     value={str_value} 
                     style={{width:"auto"}}
-                    onChange={this.onAutoCompleteChanges.bind(this,f,unique_id,row_idx)}
+                    onChange={this.props.onChange.bind(this,f)}
                     />);
       }
 
@@ -127,7 +102,7 @@ export default class CompFormTableRow extends React.Component {
         value = (<CompFormSelect 
                     value={str_value} 
                     field={f} 
-                    onChange={this.onSelectChanges.bind(this,f,unique_id,row_idx)}/>);
+                    onChange={this.props.onChange}/>);
       }
       
       else if( f.type === "computed" ) {
@@ -137,7 +112,7 @@ export default class CompFormTableRow extends React.Component {
       else if( f.type === "action" ) {
         if( !values["_is_new"] )
           value = (<ActionDelete 
-              onClick={this.props.onClick.bind(this,f,unique_id,row_idx)}
+              onClick={this.props.onClick.bind(this,f,row_idx)}
             />);
       }
 

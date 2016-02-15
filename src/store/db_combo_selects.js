@@ -42,6 +42,14 @@ var all_combos = {
       , {id:2, name:'EN GARANTIA'}
       , {id:3, name:'PRECIO ESPECIAL'}
       ]);
+
+    // Hard coded values
+    this.createLut( 'Proformas.Estado', [
+        {id:0, name:'CREACION'}
+      , {id:1, name:'APROBADO POR CLIENTE'}
+      , {id:2, name:'COMPLETADO'}
+      ]);
+
   }
 };
 

@@ -15,14 +15,25 @@ const CompFormTable = (props) => {
 
   // ---------------------------------------------------------------------
   // Collect information about which row/field has changed, and sent it back
-  var handleChanges = ( field, row_id, row_idx, e ) => {
+  var handleChanges = ( row_idx, field, new_value ) => {
     /*
     console.log( "----Table: handleChanges ");
-    console.log( field );
-    console.log( row_id );
-    console.log( e.target.value );
+    console.log( "row_idx", row_idx );
+    console.log( "field", field );
+    console.log( "new_value", new_value );
     */
-    props.onChange( field, row_id, row_idx, e.target.value );
+    props.onChange( row_idx, field, new_value );
+  };
+
+  // ---------------------------------------------------------------------
+  // Adds the row_idx
+  var handleClick = ( row_idx, field ) => {
+    /*
+    console.log( "----Table: handleClick ");
+    console.log( "row_idx", row_idx );
+    console.log( "field", field );
+    */
+    props.onClick( row_idx, field );
   };
 
   // For each row
@@ -37,8 +48,8 @@ const CompFormTable = (props) => {
       var row = (<CompFormTableRow 
                     layout={layout} 
                     values={row_values} 
-                    onChange={handleChanges}
-                    onClick={props.onClick}
+                    onChange={handleChanges.bind(this, row_idx)}
+                    onClick={handleClick.bind(this, row_idx)}
                     row_idx={row_idx}
                     key={row_idx}
                     />);

@@ -7,6 +7,12 @@ import db_combo_selects from '../../store/db_combo_selects';
 
 export default class CompFormSelect extends React.Component {
 
+  handleChange( event, index, new_value ) {
+    // Not using event/index, just the new_value
+    // console.log( "CompSelect::handleChange", this.props.field, new_value );
+    this.props.onChange( this.props.field, new_value );
+  }
+
   render() {
     const props = this.props;
     const f     = props.field;
@@ -17,7 +23,7 @@ export default class CompFormSelect extends React.Component {
       <div>
       <SelectField 
         value={this.props.value} 
-        onChange={this.props.onChange}
+        onChange={this.handleChange.bind(this)}
         hintText={f.hint}
         >
         {items}
@@ -33,4 +39,3 @@ CompFormSelect.propTypes = {
   onChange: PropTypes.func
 };
 
-//export default CompFormSelect;

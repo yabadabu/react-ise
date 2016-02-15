@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import DatePicker from 'material-ui/lib/date-picker/date-picker';
+import * as layouts from '../../store/db_layouts.js';
 
 function fmtDate( dt ) {
   return dt.toLocaleDateString();
@@ -9,6 +10,12 @@ function fmtDate( dt ) {
 const CompFormDate = (props) => {
   const f         = props.field;
   const curr_date = new Date( props.value );
+
+  // Drop the first argument, and send date in a god format for us
+  let handleChange = ( this_is_null, new_date ) => {
+    props.onChange( f, layouts.asYYYYMMDD( new_date )); 
+  };
+
   return (
     <DatePicker
       hintText={f.field}
@@ -20,7 +27,7 @@ const CompFormDate = (props) => {
       formatDate={fmtDate}
       value={curr_date}
       mode="landscape" 
-      onChange={props.onChange}
+      onChange={handleChange}
       />);
 };
 

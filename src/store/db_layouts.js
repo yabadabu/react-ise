@@ -46,6 +46,7 @@ const all_layouts = {
               }
              },
       { field:"NIF", type:"text", hint:"NIF/CIF", style:{ width:"10%"} },
+      { field:"IDState", type:"select", lut:"Proformas.Estado", default_value:0, hint:"Estado"},
       { type:"separator"} ,
       { field:"Fecha", type:"date", mode:"landscape", hint:"Fecha de Creación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },
       //{ field:"ChangeDate", type:"date", hint:"Fecha de Modificación", textstyle:{ width:"90px" }, style:{display:"inline-block" } },

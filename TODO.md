@@ -3,6 +3,14 @@
 - test limit to in the get *
 - Discard old clientes from the queries
 
+- callback of changes
+    field -> new_value
+    array_field/idx/subfield -> new_value
+
+    onFocus -> saveInitialState
+    onBlur  -> 
+
+
 - Get quoted/non quoted unique id filter queries automatically
 - Move update/select to another place => layout?
 / Option to delete a sub record

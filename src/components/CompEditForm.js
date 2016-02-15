@@ -35,7 +35,13 @@ export default class CompEditForm extends React.Component {
   }
 
   // -------------------------------------------------------------
+  // All form components finally call this method, just giving the field
+  // object and the new value they want to write
   handleChange( field, new_value ) {
+    // If someone sends us a e.target.value, get the value directly
+    if( new_value.target && typeof new_value.target === "object" )
+      new_value = new_value.target.value;
+
     var changed = {};
     changed[field.field] = new_value;
     // add changed to this.props.data creating a new object which is 
@@ -43,52 +49,41 @@ export default class CompEditForm extends React.Component {
     this.props.onChange( Object.assign( {}, this.props.data, changed));
   }
 
-  handleTextChange( field, e ) { 
-    this.handleChange( field, e.target.value); 
-  }
-  handleAutoCompleteChange( field, new_value ) { 
-    this.handleChange( field, new_value); 
-  }
-  handleSelectChange( field, event, index, new_value ) { 
-    //console.log( field, event, index, new_value )
-    this.handleChange( field, new_value); 
-  }
-  handleDateChange( field, this_is_null, new_date ) {
-    this.handleChange( field, layouts.asYYYYMMDD( new_date )); 
-  }
-  handleTableChange( main_field, external_field, external_id, external_idx, new_value ) {
+  handleTableChange( field, row_idx, row_field, new_value ) {
+    // If someone sends us a e.target.value, get the value directly
+    if( new_value.target && typeof new_value.target === "object" )
+      new_value = new_value.target.value;
+
     /*
-    console.log( "at handleTableChange" );
-    console.log( this );
-    console.log( main_field );        // details
-    console.log( external_field );    // REF
-    console.log( external_id );       // REF.value => 8
-    console.log( external_idx );      // Row index
-    console.log( new_value );         // new value as string/number/null
+    console.log( "at CompEditForm::handleTableChange" );
+    console.log( "this", this );
+    console.log( "field", field );             // details
+    console.log( "row_idx", row_idx );           // Row index
+    console.log( "row_field", row_field );         // REF
+    console.log( "new_value", new_value );         // new value as string/number/null
     console.log( this.props.data );
     */
-    var new_data = this.props.data[main_field.field];
-    new_data[ external_idx ][ external_field.field ] = new_value;
+    var new_data = this.props.data[field.field];
+    new_data[ row_idx ][ row_field.field ] = new_value;
     //console.log( new_data );
-    this.handleChange( main_field, new_data); 
+    this.handleChange( field, new_data); 
   }
 
-  handleTableClick( main_field, external_field, external_id, external_idx ) {
+  handleTableClick( field, row_idx, row_field ) {
     /*
     console.log( "at handleTableClick" );
-    console.log( this );
-    console.log( main_field );        // details
-    console.log( external_field );    // f.field = Delete
-    console.log( external_id );       // unique id of the row
-    console.log( external_idx );      // index in props
+    console.log( "this", this );
+    console.log( "field", field );        // details
+    console.log( "row_idx", row_idx );      // index in props
+    console.log( "row_field", row_field );    // f.field = Delete
     console.log( this.props.data );
     */
-    var rows = this.props.data[main_field.field];
-    //console.log( "About to delete row idx ", external_idx, " from ", rows);
-    //rows.splice( external_idx, 1 );
-    rows[ external_idx ]._deleted = true;
+    var rows = this.props.data[field.field];
+    //console.log( "About to delete row idx ", row_idx, " from ", rows);
+    //rows.splice( row_idx, 1 );
+    rows[ row_idx ]._deleted = true;
     //console.log( new_data );
-    this.handleChange( main_field, rows); 
+    this.handleChange( field, rows); 
   }
 
   handleAddNewDetailOnTable( f ) {
@@ -173,26 +168,26 @@ export default class CompEditForm extends React.Component {
         continue;
       } 
       let value = obj[ f.field ];
-      let str_value = value ? value.toString() : null;
+      let str_value = value != undefined ? value.toString() : null;
 
       if( f.type === "text" ) {
         entries.push( 
-          <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleTextChange.bind(this,f)}/>
+          <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleChange.bind(this,f)}/>
         );
 
       } else if( f.type === "lut" ) {
         entries.push( 
-          <CompFormAutoComplete field={f} value={str_value} key={key} onChange={this.handleAutoCompleteChange.bind(this,f)}/>
+          <CompFormAutoComplete field={f} value={str_value} key={key} onChange={this.handleChange.bind(this,f)}/>
         );
 
       } else if( f.type === "date" ) {
         entries.push(
-          <CompFormDate field={f} value={value} key={key} onChange={this.handleDateChange.bind(this,f)}/>
+          <CompFormDate field={f} value={value} key={key} onChange={this.handleChange.bind(this)}/>
         );
 
       } else if( f.type === "select" ) {
         entries.push(
-          <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleSelectChange.bind(this,f)}/>
+          <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleChange.bind(this)}/>
         );
 
       } else if( f.type === "db_search" ) {
