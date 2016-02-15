@@ -22,7 +22,7 @@ const CompFormTable = (props) => {
     console.log( "field", field );
     console.log( "new_value", new_value );
     */
-    props.onChange( row_idx, field, new_value );
+    props.onRowChange( row_idx, field, new_value );
   };
 
   // ---------------------------------------------------------------------
@@ -33,7 +33,7 @@ const CompFormTable = (props) => {
     console.log( "row_idx", row_idx );
     console.log( "field", field );
     */
-    props.onClick( row_idx, field );
+    props.onRowClick( row_idx, field );
   };
 
   // For each row
@@ -52,6 +52,7 @@ const CompFormTable = (props) => {
                     onClick={handleClick.bind(this, row_idx)}
                     row_idx={row_idx}
                     key={row_idx}
+                    creating_new={props.creating_new}
                     />);
       data_rows.push(row);
     }
@@ -85,9 +86,10 @@ const CompFormTable = (props) => {
 CompFormTable.propTypes = {
   field: PropTypes.object.isRequired,
   value: PropTypes.array.isRequired,
-  onChange: PropTypes.func,
-  onClick: PropTypes.func,
-  onClickNew: PropTypes.func
+  onRowChange: PropTypes.func,
+  onRowClick: PropTypes.func,
+  onClickNew: PropTypes.func,
+  creating_new: PropTypes.bool
 };
 
 export default CompFormTable;

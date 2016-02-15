@@ -93,6 +93,7 @@ export default class CompSearchDB extends React.Component {
                      , ["*"]
                      , resolved_filter
                      , (data) => { 
+                        //console.log( "Got the full data from the db", data[0]);
                         this.props.onClickSearchResult( data[0], this.state, null );
                      });
     } else {

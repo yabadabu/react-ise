@@ -24,7 +24,7 @@ export default class CompFormAutoComplete extends React.Component {
     } else if( value === "" || value == null ) {
       this.setState({errorText:"Value required"});
     } else {
-      this.props.onChange( value );
+      this.props.onChange( this.props.field, value );
       this.setState({errorText:null});
     }
   }

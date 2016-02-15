@@ -10,13 +10,17 @@ export default class CompFormText extends React.Component {
     // Check if any search field wants the focus.
     // Requires 'ref={..} when instantiating the field'
     var f = this.props.field;
-    if( f.focus_on_mount ) {
+    if( this.props.creating_new && f.focus_on_mount ) {
       this.refs[ f.field ].focus();
     }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return nextProps.value !== this.props.value;
+  }
+
+  handleChange( e ) {
+    this.props.onChange( this.props.field, e.target.value );
   }
 
   render() {
@@ -52,7 +56,7 @@ export default class CompFormText extends React.Component {
         id={f.field}
         disabled={disabled}
         errorText={errorText}
-        onChange={props.onChange}
+        onChange={this.handleChange.bind(this)}
         ref={f.field}
         />
     );

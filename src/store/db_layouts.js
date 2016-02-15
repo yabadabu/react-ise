@@ -29,7 +29,7 @@ const all_layouts = {
     },
     fields: [
       { field:"IDProforma", type:"text", hint:"# Proforma", focus_on_mount:true, read_only:true, style:{ width:"75px"} },
-      { field:"dlgIDProforma", type:"db_query_and_update"
+      { field:"dlgIDProforma", type:"db_query_and_update", only_when_creating_new:true
              , update_fields: { IDProforma:"IDProforma" } },
       { field:"IDCliente", type:"text", read_only:true, style:{ display:"none"} },
       { field:"Empresa", type:"text", hint:"Nombre de la empresa", style:{ width:"40%"} },
@@ -166,7 +166,7 @@ export function get( name ) {
 }
 
 // -------------------------------------------------------------------
-export function getFieldByname( layout, field_name ) {
+export function getFieldByName( layout, field_name ) {
   const idx = _.findIndex( layout.fields, (r)=>{ return r.field === field_name; } );
   if( idx >= 0 )
     return layout.fields[idx];

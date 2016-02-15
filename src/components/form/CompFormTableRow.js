@@ -41,7 +41,8 @@ export default class CompFormTableRow extends React.Component {
                     field={f} 
                     value={value} 
                     inside_table 
-                    onChange={this.props.onChange.bind(this, f)}/>);
+                    creating_new={this.props.creating_new}
+                    onChange={this.props.onChange}/>);
       } 
 
       // Show the text associated to an id of a lut. Not editable, just the name
@@ -56,6 +57,7 @@ export default class CompFormTableRow extends React.Component {
       // Must show the id of a lut, but show the text close to it.
       // For example a REF which is a valid id but has the text close
       else if( f.type === "lut_id" ) {
+/*
         let handle_blur = (e)=>{
           if( e && e.target && e.target.value && f.onBlur ) {
             const new_value = e.target.value;
@@ -63,7 +65,7 @@ export default class CompFormTableRow extends React.Component {
             // and a callback to change other fields of the same row
             f.onBlur( new_value, values, ( field_name, field_value )=>{
               console.log( "User wants to update ", field_name, " to ", field_value ); 
-              var f_to_update = layouts.getFieldByname( layout, field_name );
+              var f_to_update = layouts.getFieldByName( layout, field_name );
               if( !f ) {
                 console.log( "Field " + field_name + " does not exist in the layout");
                 return;
@@ -73,13 +75,14 @@ export default class CompFormTableRow extends React.Component {
             });
           }
         };
+                 onBlur={handle_blur}
+                 */
         value = (
           <input list={f.lut} 
                  defaultValue={value} 
                  type="text"
                  ref={f.field}
-                 onBlur={handle_blur}
-                 onChange={this.props.onChange.bind(this,f)}
+                 onChange={this.props.onChange}
                  >
           </input>
           );
@@ -92,7 +95,7 @@ export default class CompFormTableRow extends React.Component {
                     field={f} 
                     value={str_value} 
                     style={{width:"auto"}}
-                    onChange={this.props.onChange.bind(this,f)}
+                    onChange={this.props.onChange}
                     />);
       }
 
@@ -134,6 +137,7 @@ CompFormTableRow.propTypes = {
 , row_idx: PropTypes.number.isRequired
 , onChange: PropTypes.func.isRequired
 , onClick: PropTypes.func
+, creating_new: PropTypes.bool
 };
 
 export default CompFormTableRow;

@@ -35,20 +35,6 @@ export default class CompEditForm extends React.Component {
   }
 
   // -------------------------------------------------------------
-  // All form components finally call this method, just giving the field
-  // object and the new value they want to write
-  handleChange( field, new_value ) {
-    // If someone sends us a e.target.value, get the value directly
-    if( new_value.target && typeof new_value.target === "object" )
-      new_value = new_value.target.value;
-
-    var changed = {};
-    changed[field.field] = new_value;
-    // add changed to this.props.data creating a new object which is 
-    // sent as 'changed' to the parent props handler
-    this.props.onChange( Object.assign( {}, this.props.data, changed));
-  }
-
   handleTableChange( field, row_idx, row_field, new_value ) {
     // If someone sends us a e.target.value, get the value directly
     if( new_value.target && typeof new_value.target === "object" )
@@ -66,7 +52,7 @@ export default class CompEditForm extends React.Component {
     var new_data = this.props.data[field.field];
     new_data[ row_idx ][ row_field.field ] = new_value;
     //console.log( new_data );
-    this.handleChange( field, new_data); 
+    this.props.onChange( field, new_data ); 
   }
 
   handleTableClick( field, row_idx, row_field ) {
@@ -83,7 +69,7 @@ export default class CompEditForm extends React.Component {
     //rows.splice( row_idx, 1 );
     rows[ row_idx ]._deleted = true;
     //console.log( new_data );
-    this.handleChange( field, rows); 
+    this.props.onChange( field, rows ); 
   }
 
   handleAddNewDetailOnTable( f ) {
@@ -96,7 +82,7 @@ export default class CompEditForm extends React.Component {
     var all_details = this.props.data[f.field];
     new_rec._is_new = true;
     all_details.push( new_rec );
-    this.handleChange( f, all_details); 
+    this.props.onChange( f, all_details); 
   }
 
   // ---------------------------------------------------------------- 
@@ -110,6 +96,8 @@ export default class CompEditForm extends React.Component {
   }
 
   handleDlgChooseFromDB(f,row) {
+    //console.log( "At handleDlgChooseFromDB", f, row, this.props );
+    /*
     // Do a bulk update of all the fields at f.update_fields, wih the values
     // taken from row
     var changed = {};
@@ -119,6 +107,13 @@ export default class CompEditForm extends React.Component {
     });
     //console.log( "Dlg closes and updates: ", changed, row, f.update_fields );
     this.props.onChange( Object.assign( {}, this.props.data, changed));
+    */
+    const my_layout = this.props.layout;
+    _.each( f.update_fields, (v,k)=>{     // k,v are the field name in the query and the layout
+      var f = layouts.getFieldByName( my_layout, v );
+      //console.log( "Sending ", k, f, row[k]);
+      this.props.onChange( f, row[k] );
+    });
     this.handleCloseDlg();
   }
 
@@ -157,6 +152,7 @@ export default class CompEditForm extends React.Component {
   render() {
     const cfg = this.props.layout;
     const obj = this.props.data;
+    const onChange = this.props.onChange;
 
     var key = 1;
     let entries = [];
@@ -167,27 +163,32 @@ export default class CompEditForm extends React.Component {
         entries.push( <div key={key}></div>);
         continue;
       } 
+
+      // Skip those fields which only appear when creating a new record
+      if( f.only_when_creating_new && !this.props.creating_new )
+        continue;
+
       let value = obj[ f.field ];
       let str_value = value != undefined ? value.toString() : null;
 
       if( f.type === "text" ) {
         entries.push( 
-          <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={this.handleChange.bind(this,f)}/>
+          <CompFormText field={f} value={value} key={key} creating_new={this.props.creating_new} onChange={onChange}/>
         );
 
       } else if( f.type === "lut" ) {
         entries.push( 
-          <CompFormAutoComplete field={f} value={str_value} key={key} onChange={this.handleChange.bind(this,f)}/>
+          <CompFormAutoComplete field={f} value={str_value} key={key} onChange={onChange}/>
         );
 
       } else if( f.type === "date" ) {
         entries.push(
-          <CompFormDate field={f} value={value} key={key} onChange={this.handleChange.bind(this)}/>
+          <CompFormDate field={f} value={value} key={key} onChange={onChange}/>
         );
 
       } else if( f.type === "select" ) {
         entries.push(
-          <CompFormSelect field={f} value={str_value} key={key} onChange={this.handleChange.bind(this)}/>
+          <CompFormSelect field={f} value={str_value} key={key} onChange={onChange}/>
         );
 
       } else if( f.type === "db_search" ) {
@@ -196,7 +197,7 @@ export default class CompEditForm extends React.Component {
           <CompSearchDB layout={layout_data} key={key} 
                         no_action_buttons 
                         no_headers 
-                        onClickSearchResult={this.props.onChooseFromDBSearch.bind(this)}/>
+                        onClickSearchResult={this.props.onChooseFromDBSearch}/>
         );
 
       } else if( f.type === "modal_dialog" ) {
@@ -227,9 +228,10 @@ export default class CompEditForm extends React.Component {
           continue;
         entries.push(
           <CompFormTable field={f} value={value} key={key}
-                         onClick={this.handleTableClick.bind(this,f)}
-                         onChange={this.handleTableChange.bind(this,f)}
+                         onRowClick={this.handleTableClick.bind(this,f)}
+                         onRowChange={this.handleTableChange.bind(this,f)}
                          onClickNew={this.handleAddNewDetailOnTable.bind(this,f)}
+                         creating_new={this.props.creating_new}
                          />
         );
 
@@ -255,6 +257,5 @@ CompEditForm.propTypes = {
   onClick:  PropTypes.func,
   onChange: PropTypes.func,
   onChooseFromDBSearch: PropTypes.func,
-  creating_new: PropTypes.bool, 
-  has_changed: PropTypes.bool
+  creating_new: PropTypes.bool
 };

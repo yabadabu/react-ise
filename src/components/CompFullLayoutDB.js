@@ -140,7 +140,7 @@ export default class CompFullLayoutDB extends React.Component {
           //console.log( "External layout" );
           //console.log( ext_layout );
           //console.log( "Local field to search is " + f.local );
-          var searched_field = layouts.getFieldByname( layout, f.local );
+          var searched_field = layouts.getFieldByName( layout, f.local );
           //console.log( "searched_field " );
           //console.log( searched_field );
           var searched_value = db_all_results[ searched_field.field ];
@@ -193,8 +193,27 @@ export default class CompFullLayoutDB extends React.Component {
     this.setState(ns);
   }
 
-  onDataChange( new_db_data ) {
-    this.validateData({db_data:new_db_data});
+  // --------------------------------------------------------------
+  onDataChange( field, new_value ) {
+    console.log( "onDataChange", field, new_value );
+    // If someone sends us a e.target.value, get the value directly
+    if( new_value && new_value.target && typeof new_value.target === "object" )
+      new_value = new_value.target.value;
+
+    var new_db_delta = this.state.db_delta;
+    new_db_delta[ field.field ] = new_value;
+    var new_db_data = this.state.db_data;
+    new_db_data[ field.field ] = new_value;
+    
+
+    var changed_rec = ( Object.keys( new_db_delta ).length != 0 );
+//    var changed = {};
+//    changed[field.field] = new_value;
+//     Object.assign( {}, this.state.db_data, changed));
+    // add changed to this.props.data creating a new object which is 
+    // sent as 'changed' to the parent props handler
+    this.setState( {db_data:new_db_data, db_delta:new_db_delta, db_changed_rec:changed_rec } );
+    //this.validateData({db_data:new_db_data});
   }
 
   // --------------------------------------------------------------
@@ -253,7 +272,7 @@ export default class CompFullLayoutDB extends React.Component {
         if( Array.isArray(v)) {
           // Updating details!
           //console.log( "Updating subtable " + k);
-          var searched_field = layouts.getFieldByname( layout, k );   // All fields of 'details'
+          var searched_field = layouts.getFieldByName( layout, k );   // All fields of 'details'
           var ext_layout     = layouts.get( searched_field.layout );  // Layout
           var ext_key_field  = ext_layout.key_field;
           // For each detail...
@@ -267,7 +286,7 @@ export default class CompFullLayoutDB extends React.Component {
 
               // Remove computed fields
               const changes_to_save = _.reduce(sub_changes, (accum,v,k)=>{
-                var field = layouts.getFieldByname( ext_layout, k );
+                var field = layouts.getFieldByName( ext_layout, k );
                 if( field.type !== "computed" )
                   accum[ k ] = v;
                 return accum;
@@ -491,7 +510,7 @@ export default class CompFullLayoutDB extends React.Component {
     var json = this.state.trace ? JSON.stringify( this.state, null, '  ' ) : "";
 
     if( this.state.trace == 1 ) {
-     json = "State: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
+     json = "Delta: " + JSON.stringify( this.state.db_delta, null, '  ' ) + "\n";
     } else if( this.state.trace == 2 ) {
      json = "State: " + JSON.stringify( this.state, null, '  ' ) + "\n";
      /*
